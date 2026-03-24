@@ -5,7 +5,7 @@
     "category": "한식",
     "price": 9000,
     "comment": "점심메뉴 메뉴판에서 -5000원, 제육정식도 맛있음",
-    "tags": ["제육정식","보쌈정식","불고기정식","튀김족"],
+    "tags": ["제육","보쌈","불고기","족발","팀장님추천"],
     "naverMapUrl": "https://naver.me/5l7kUDIb"
   },
   {
@@ -14,7 +14,7 @@
     "category": "한식",
     "price": 8000,
     "comment": "점심 한식뷔페",
-    "tags": ["팀장님추천"],
+    "tags": ["팀장님추천","한식뷔페"],
     "naverMapUrl": "https://naver.me/x67ykRIt"
   },
   {
@@ -23,7 +23,7 @@
     "category": "한식",
     "price": 10000,
     "comment": "매콤한 육개장 맛집",
-    "tags": ["팀장님추천"],
+    "tags": ["팀장님추천","육개장"],
     "naverMapUrl": "https://naver.me/FutKEYiI"
   },
   {
@@ -32,7 +32,7 @@
     "category": "한식",
     "price": 12000,
     "comment": "청와대 출신 셰프 (생)육회비빔밥 맛집 ",
-    "tags": ["육회비빔밥","멍게비빔밥","매운돼지갈비"],
+    "tags": ["육회","팀장님추천"],
     "naverMapUrl": "https://naver.me/F3TXm30I"
   },
   {
@@ -41,7 +41,7 @@
     "category": "한식",
     "price": 11000,
     "comment": "종로3가역 골목 순대국, 수육백반",
-    "tags": ["순대국","수육백반"],
+    "tags": ["국밥","수육","팀장님추천"],
     "naverMapUrl": "https://naver.me/IMyG5oLE"
   },
   {
@@ -50,7 +50,7 @@
     "category": "한식",
     "price": 9000,
     "comment": "해물칼국수 맛집",
-    "tags": ["칼국수"],
+    "tags": ["칼국수","팀장님추천"],
     "naverMapUrl": "https://naver.me/5k7fx7Qm"
   },
   {
@@ -59,7 +59,7 @@
     "category": "한식",
     "price": 9000,
     "comment": "외국인들 많이 오는 칼국수 맛집",
-    "tags": ["칼국수","웨이팅"],
+    "tags": ["칼국수","웨이팅","팀장님추천"],
     "naverMapUrl": "https://naver.me/FpxlU8K1"
   },
   {
@@ -68,7 +68,7 @@
     "category": "일식",
     "price": 10000,
     "comment": "곧 없어질지 모르는 돈까스 맛집",
-    "tags": ["돈까스", "웨이팅"],
+    "tags": ["돈까스", "웨이팅","팀장님추천"],
     "naverMapUrl": "https://naver.me/xDJ9FCZZ"
   },
   {
@@ -86,7 +86,7 @@
     "category": "한식",
     "price": 8500,
     "comment": "돈까스와 찌개류가 같이 나오는 맛집/조금멀다",
-    "tags": ["혼밥", "무난함", "빨리나옴"],
+    "tags": ["돈까스", "팀장님추천"],
     "naverMapUrl": "https://naver.me/x1V5Cubg"
   },
   {
@@ -95,7 +95,7 @@
     "category": "양식",
     "price": 13900,
     "comment": "오래된 함박스테이크 맛집",
-    "tags": ["함박스테이크"],
+    "tags": ["함박스테이크","팀장님추천"],
     "naverMapUrl": "https://naver.me/x8tpeMCL"
   },
   {
@@ -104,7 +104,16 @@
     "category": "한식",
     "price": 13000,
     "comment": "인사동 나주곰탕 맛집",
-    "tags": ["나주곰탕"],
+    "tags": ["국밥"],
     "naverMapUrl": "https://naver.me/G58gJqj3"
-  }
+  },
+  {
+    "id": 13,
+    "name": "동경우동",
+    "category": "일식",
+    "price": 5000,
+    "comment": "저렴한 우동맛집",
+    "tags": ["우동"],
+    "naverMapUrl": "https://naver.me/502Ihgnm"
+  },
 ]
