@@ -1,110 +1,110 @@
 [
   {
     "id": 1,
-    "name": "정든식당",
+    "name": "잭아저씨족발보쌈",
     "category": "한식",
     "price": 9000,
-    "comment": "제육볶음 무난하고 빨리 나와서 점심시간 짧을 때 좋음.",
-    "tags": ["혼밥", "빨리나옴", "가성비"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EC%A0%95%EB%93%A0%EC%8B%9D%EB%8B%B9"
+    "comment": "점심메뉴 메뉴판에서 -5000원, 제육정식도 맛있음",
+    "tags": ["제육정식","보쌈정식","불고기정식","튀김족"],
+    "naverMapUrl": "https://naver.me/5l7kUDIb"
   },
   {
     "id": 2,
-    "name": "홍콩반점",
-    "category": "중식",
-    "price": 10000,
-    "comment": "짬뽕 땡길 때 무난한 선택. 매운 국물 원할 때 딱.",
-    "tags": ["혼밥", "매운맛", "빨리나옴"],
-    "naverMapUrl": "https://map.naver.com/p/search/%ED%99%8D%EC%BD%A9%EB%B0%98%EC%A0%90"
+    "name": "이리오너라",
+    "category": "한식",
+    "price": 8000,
+    "comment": "점심 한식뷔페",
+    "tags": ["팀장님추천"],
+    "naverMapUrl": "https://naver.me/x67ykRIt"
   },
   {
     "id": 3,
-    "name": "스시하루",
-    "category": "일식",
-    "price": 14000,
-    "comment": "초밥 깔끔하고 조용해서 손님 올 때 가기 좋음.",
-    "tags": ["조용함", "손님응대", "깔끔함"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EC%8A%A4%EC%8B%9C%ED%95%98%EB%A3%A8"
+    "name": "육개장인",
+    "category": "한식",
+    "price": 10000,
+    "comment": "매콤한 육개장 맛집",
+    "tags": ["팀장님추천"],
+    "naverMapUrl": "https://naver.me/FutKEYiI"
   },
   {
     "id": 4,
-    "name": "바삭돈까스",
-    "category": "일식",
-    "price": 11000,
-    "comment": "돈까스 바삭하고 양 많음. 든든하게 먹고 싶을 때 추천.",
-    "tags": ["든든함", "가성비", "혼밥"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EB%B0%94%EC%82%AD%EB%8F%88%EA%B9%8C%EC%8A%A4"
+    "name": "종각밥상",
+    "category": "한식",
+    "price": 12000,
+    "comment": "청와대 출신 셰프 (생)육회비빔밥 맛집 ",
+    "tags": ["육회비빔밥","멍게비빔밥","매운돼지갈비"],
+    "naverMapUrl": "https://naver.me/F3TXm30I"
   },
   {
     "id": 5,
-    "name": "샐러드랩",
-    "category": "샐러드",
-    "price": 12000,
-    "comment": "가볍게 먹고 싶을 때 좋고 포케류도 괜찮음.",
-    "tags": ["다이어트", "가벼움", "포장"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EC%83%90%EB%9F%AC%EB%93%9C%EB%9E%A9"
+    "name": "돈맛꿀",
+    "category": "한식",
+    "price": 11000,
+    "comment": "종로3가역 골목 순대국, 수육백반",
+    "tags": ["순대국","수육백반"],
+    "naverMapUrl": "https://naver.me/IMyG5oLE"
   },
   {
     "id": 6,
-    "name": "오늘의파스타",
-    "category": "양식",
-    "price": 15000,
-    "comment": "크림파스타 무난하고 분위기 괜찮아서 기분전환용 점심에 좋음.",
-    "tags": ["분위기좋음", "여유점심", "데이트감성"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EC%98%A4%EB%8A%98%EC%9D%98%ED%8C%8C%EC%8A%A4%ED%83%80"
+    "name": "찬양집",
+    "category": "한식",
+    "price": 9000,
+    "comment": "해물칼국수 맛집",
+    "tags": ["칼국수"],
+    "naverMapUrl": "https://naver.me/5k7fx7Qm"
   },
   {
     "id": 7,
-    "name": "국밥한그릇",
+    "name": "종로할머니칼국수",
     "category": "한식",
-    "price": 9500,
-    "comment": "비 오는 날이나 해장 필요할 때 든든한 선택.",
-    "tags": ["든든함", "해장", "비오는날"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EA%B5%AD%EB%B0%A5%ED%95%9C%EA%B7%B8%EB%A6%87"
+    "price": 9000,
+    "comment": "외국인들 많이 오는 칼국수 맛집",
+    "tags": ["칼국수","웨이팅"],
+    "naverMapUrl": "https://naver.me/FpxlU8K1"
   },
   {
     "id": 8,
-    "name": "분식공방",
-    "category": "분식",
-    "price": 8000,
-    "comment": "떡볶이랑 김밥 조합 무난. 저렴하고 빠름.",
-    "tags": ["가성비", "빨리나옴", "간단식사"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EB%B6%84%EC%8B%9D%EA%B3%B5%EB%B0%A9"
+    "name": "부자돈까스",
+    "category": "일식",
+    "price": 10000,
+    "comment": "곧 없어질지 모르는 돈까스 맛집",
+    "tags": ["돈까스", "웨이팅"],
+    "naverMapUrl": "https://naver.me/xDJ9FCZZ"
   },
   {
     "id": 9,
-    "name": "고기굽는집",
-    "category": "고기",
-    "price": 18000,
-    "comment": "회식이나 팀 점심으로 가기 좋고 고기 질 괜찮음.",
-    "tags": ["회식", "든든함", "단체가능"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EA%B3%A0%EA%B8%B0%EA%B5%BD%EB%8A%94%EC%A7%91"
+    "name": "오덕장",
+    "category": "한식",
+    "price": 10000,
+    "comment": "오징어 정식 맛집. 회식으로도 괜찮",
+    "tags": ["회식", "오징어"],
+    "naverMapUrl": "https://naver.me/Fr7pVxQ2"
   },
   {
     "id": 10,
-    "name": "카레하우스",
-    "category": "일식",
-    "price": 10500,
-    "comment": "호불호 적고 혼자 가도 편한 카레집.",
+    "name": "돈까스앤우찌",
+    "category": "한식",
+    "price": 8500,
+    "comment": "돈까스와 찌개류가 같이 나오는 맛집/조금멀다",
     "tags": ["혼밥", "무난함", "빨리나옴"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EC%B9%B4%EB%A0%88%ED%95%98%EC%9A%B0%EC%8A%A4"
+    "naverMapUrl": "https://naver.me/x1V5Cubg"
   },
   {
     "id": 11,
-    "name": "쌀국수로드",
-    "category": "아시안",
-    "price": 11000,
-    "comment": "쌀국수 깔끔하고 덜 부담스러워서 자주 가게 됨.",
-    "tags": ["깔끔함", "혼밥", "무난함"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EC%8C%80%EA%B5%AD%EC%88%98%EB%A1%9C%EB%93%9C"
+    "name": "우정함박",
+    "category": "양식",
+    "price": 13900,
+    "comment": "오래된 함박스테이크 맛집",
+    "tags": ["함박스테이크"],
+    "naverMapUrl": "https://naver.me/x8tpeMCL"
   },
   {
     "id": 12,
-    "name": "버거스팟",
-    "category": "패스트푸드",
+    "name": "향교나주곰탕",
+    "category": "한식",
     "price": 13000,
-    "comment": "햄버거 땡길 때 가끔 가기 좋고 포장도 편함.",
-    "tags": ["포장", "간단식사", "미국맛"],
-    "naverMapUrl": "https://map.naver.com/p/search/%EB%B2%84%EA%B1%B0%EC%8A%A4%ED%8C%9F"
+    "comment": "인사동 나주곰탕 맛집",
+    "tags": ["나주곰탕"],
+    "naverMapUrl": "https://naver.me/G58gJqj3"
   }
 ]
