@@ -52,6 +52,73 @@ a {
   width: min(1100px, calc(100% - 32px));
   margin: 32px auto 60px;
 }
+.hero-links {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.notion-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 16px;
+  border-radius: 12px;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 700;
+  border: 1px solid #111827;
+  transition: all 0.2s ease;
+}
+
+.notion-link-btn:hover {
+  background: #1f2937;
+  border-color: #1f2937;
+  transform: translateY(-1px);
+}
+
+.add-accordion {
+  width: 100%;
+}
+
+.add-accordion__summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.add-accordion__summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.accordion-hint {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--soft-primary);
+  padding: 8px 12px;
+  border-radius: 999px;
+}
+
+.add-accordion__content {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.add-accordion[open] .accordion-hint {
+  background: #e5e7eb;
+  color: #374151;
+}
 
 .hero {
   display: flex;
