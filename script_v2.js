@@ -1,4 +1,4 @@
-const API_URL = "여기에_네_앱스스크립트_웹앱_URL_넣기";
+const API_URL = "https://script.google.com/macros/s/AKfycby61sHSYBk3RAFQt7Aqqs-rbuxVel8aq2ISsDom7viFzc0bh_LZi7DId8wrW4EHSne0/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
