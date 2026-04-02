@@ -52,6 +52,78 @@ a {
   width: min(1100px, calc(100% - 32px));
   margin: 32px auto 60px;
 }
+
+.filter-accordion {
+  width: 100%;
+}
+
+.filter-accordion__summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.filter-accordion__summary::-webkit-details-marker {
+  display: none;
+}
+
+.filter-accordion__content {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.filter-accordion[open] .accordion-hint,
+.add-accordion[open] .accordion-hint {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.loading-box {
+  min-width: 240px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
+  text-align: center;
+}
+
+.loading-box p {
+  margin: 14px 0 0;
+  color: #374151;
+  font-weight: 600;
+}
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto;
+  border: 4px solid #dbeafe;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .hero-links {
   margin-top: 16px;
   display: flex;
