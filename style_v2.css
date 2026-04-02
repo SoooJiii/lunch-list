@@ -1,0 +1,50 @@
+.restaurant-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.restaurant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.restaurant-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: #f3f3f3;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.star-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.star-button {
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.static-stars {
+  margin-right: 6px;
+}
+
+.rating-item {
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+}
