@@ -1,5 +1,5 @@
 const loadingOverlay = document.getElementById("loadingOverlay");
-const API_URL = "https://script.google.com/macros/s/AKfycbwYNOTfZrGIHK05R9z4qc2EhnzEYcJYnVuXDO5Lz0-4_zY2vu8LY2ntgez6B5Kcv2Nr/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycby_QF3k90oiUVextwZDD7WdpVlQfnzHNf7XGxhcll4gd-Bscwb3rqnz_WE7injPvVRX/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
@@ -91,22 +91,15 @@ async function loadData() {
 
     const cacheBuster = Date.now();
 
-    const [restaurantRes, ratingRes] = await Promise.all([
-      fetch(`${API_URL}?action=getRestaurants&t=${cacheBuster}`, {
-        method: "GET",
-        cache: "no-store"
-      }),
-      fetch(`${API_URL}?action=getRatings&t=${cacheBuster}`, {
-        method: "GET",
-        cache: "no-store"
-      })
-    ]);
+    const response = await fetch(`${API_URL}?action=getAllData&t=${cacheBuster}`, {
+      method: "GET",
+      cache: "no-store"
+    });
 
-    const restaurantJson = await restaurantRes.json();
-    const ratingJson = await ratingRes.json();
+    const result = await response.json();
 
-    const restaurants = Array.isArray(restaurantJson.data) ? restaurantJson.data : [];
-    const ratings = Array.isArray(ratingJson.data) ? ratingJson.data : [];
+    const restaurants = Array.isArray(result.restaurants) ? result.restaurants : [];
+    const ratings = Array.isArray(result.ratings) ? result.ratings : [];
 
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
 
