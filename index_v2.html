@@ -3,22 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>점심 맛집 리스트</title>
+  <title>종로 점심 맛집 리스트</title>
   <link rel="stylesheet" href="style_v2.css" />
 </head>
 <body>
   <div class="container">
     <header class="hero">
-      <div>
-        <p class="eyebrow">Lunch Pick</p>
-        <h1>점심 맛집 리스트</h1>
-        <p class="hero-desc">
-          맛집을 같이 등록하고, 평점과 후기를 남겨보자 🍽️<br />
-          카테고리, 태그, 검색으로 골라보고 고민되면 <strong>오늘 뭐 먹지?</strong> 버튼으로 랜덤 추천!
-        </p>
-      </div>
-      <button id="randomBtn" class="random-btn" type="button">오늘 뭐 먹지?</button>
-    </header>
+  <div>
+    <p class="eyebrow">Lunch Pick</p>
+    <h1>종로 점심 맛집 리스트</h1>
+    <p class="hero-desc">
+      맛집을 같이 등록하고, 평점과 후기를 남겨보자 🍽️<br />
+      카테고리, 태그, 검색으로 골라보고 고민되면 <strong>오늘 뭐 먹지?</strong> 버튼으로 랜덤 추천!
+    </p>
+
+    <div class="hero-links">
+      <a
+        href="https://www.notion.so/7b2b4b9c5d74471f92c752cb8898f00f?v=bfe528cc08d94f528c90e858dbb7b0a2"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="notion-link-btn"
+      >
+        먹캘린더 보러가기!
+      </a>
+    </div>
+  </div>
+
+  <button id="randomBtn" class="random-btn" type="button">오늘 뭐 먹지?</button>
+</header>
 
     <section id="randomResult" class="random-result hidden" aria-live="polite">
       <div class="random-result__content">
@@ -33,7 +45,7 @@
     <section class="panel add-panel">
       <div class="section-title-wrap">
         <h2>맛집 추가</h2>
-        <p>팀원들이 같이 맛집을 등록할 수 있어</p>
+        <p>맛집을 직접 등록해주세요!</p>
       </div>
 
       <form id="addRestaurantForm" class="add-form">
