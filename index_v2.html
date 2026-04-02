@@ -1,0 +1,25 @@
+<div id="restaurant-list"></div>
+
+<select id="category-filter"></select>
+<input type="text" id="tag-filter" placeholder="태그 검색" />
+<select id="sort-filter">
+  <option value="">기본정렬</option>
+  <option value="nameAsc">이름순</option>
+  <option value="priceAsc">가격 낮은순</option>
+  <option value="priceDesc">가격 높은순</option>
+  <option value="ratingDesc">평점 높은순</option>
+  <option value="ratingCountDesc">평가 많은순</option>
+</select>
+
+<button id="random-button">오늘 뭐 먹지?</button>
+
+<form id="add-restaurant-form">
+  <input id="name" placeholder="가게 이름" />
+  <input id="category" placeholder="카테고리" />
+  <input id="price" placeholder="가격" />
+  <input id="comment" placeholder="한줄 설명" />
+  <input id="tags" placeholder="태그(쉼표구분)" />
+  <input id="naverMapUrl" placeholder="네이버지도 링크" />
+  <input id="createdBy" placeholder="등록자" />
+  <button type="submit">맛집 추가</button>
+</form>
