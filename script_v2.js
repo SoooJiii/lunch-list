@@ -5,22 +5,6 @@ let allRestaurants = [];
 let filteredRestaurants = [];
 let selectedTags = new Set();
 
-function showLoading(message = "맛집 리스트 불러오는 중...") {
-  if (!loadingOverlay) return;
-
-  const text = loadingOverlay.querySelector("p");
-  if (text) {
-    text.textContent = message;
-  }
-
-  loadingOverlay.classList.remove("hidden");
-}
-
-function hideLoading() {
-  if (!loadingOverlay) return;
-  loadingOverlay.classList.add("hidden");
-}
-
 // DOM
 const randomBtn = document.getElementById("randomBtn");
 const randomResult = document.getElementById("randomResult");
@@ -51,12 +35,96 @@ const restaurantList = document.getElementById("restaurantList");
 const emptyState = document.getElementById("emptyState");
 const restaurantCardTemplate = document.getElementById("restaurantCardTemplate");
 
+const CACHE_KEY = "lunch_restaurant_cache_v1";
+
 // 시작
 document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
-  await loadData();
+
+  const cachedData = loadRestaurantCache();
+
+  if (cachedData && cachedData.length > 0) {
+    allRestaurants = cachedData;
+    populateCategoryFilter(allRestaurants);
+    renderTagFilters(allRestaurants);
+    applyFilters();
+
+    // 캐시가 있으면 조용히 최신 데이터 갱신
+    loadDataSilently();
+  } else {
+    // 캐시가 없을 때만 로딩 보이기
+    await loadData();
+  }
 });
 
+async function loadDataSilently() {
+  try {
+    const response = await fetch(`${API_URL}?action=getAllData`, {
+      method: "GET",
+      cache: "no-store"
+    });
+
+    const result = await response.json();
+
+    const restaurants = Array.isArray(result.restaurants) ? result.restaurants : [];
+    const ratings = Array.isArray(result.ratings) ? result.ratings : [];
+
+    allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
+
+    saveRestaurantCache(allRestaurants);
+
+    populateCategoryFilter(allRestaurants);
+    renderTagFilters(allRestaurants);
+    applyFilters();
+  } catch (error) {
+    console.error("조용한 데이터 갱신 실패:", error);
+  }
+}
+
+function saveRestaurantCache(data) {
+  try {
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        savedAt: Date.now(),
+        data
+      })
+    );
+  } catch (error) {
+    console.warn("캐시 저장 실패:", error);
+  }
+}
+
+function loadRestaurantCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.data)) return null;
+
+    return parsed.data;
+  } catch (error) {
+    console.warn("캐시 불러오기 실패:", error);
+    return null;
+  }
+}
+
+function showLoading(message = "맛집 리스트 불러오는 중...") {
+  if (!loadingOverlay) return;
+
+  const text = loadingOverlay.querySelector("p");
+  if (text) {
+    text.textContent = message;
+  }
+
+  loadingOverlay.classList.remove("hidden");
+}
+
+function hideLoading() {
+  if (!loadingOverlay) return;
+  loadingOverlay.classList.add("hidden");
+}
 // 이벤트 연결
 function bindEvents() {
   if (randomBtn) {
@@ -100,6 +168,7 @@ async function loadData() {
     const ratings = Array.isArray(result.ratings) ? result.ratings : [];
 
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
+    saveRestaurantCache(allRestaurants);
 
     populateCategoryFilter(allRestaurants);
     renderTagFilters(allRestaurants);
