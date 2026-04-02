@@ -1,8 +1,25 @@
+const loadingOverlay = document.getElementById("loadingOverlay");
 const API_URL = "https://script.google.com/macros/s/AKfycbwYNOTfZrGIHK05R9z4qc2EhnzEYcJYnVuXDO5Lz0-4_zY2vu8LY2ntgez6B5Kcv2Nr/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
 let selectedTags = new Set();
+
+function showLoading(message = "맛집 리스트 불러오는 중...") {
+  if (!loadingOverlay) return;
+
+  const text = loadingOverlay.querySelector("p");
+  if (text) {
+    text.textContent = message;
+  }
+
+  loadingOverlay.classList.remove("hidden");
+}
+
+function hideLoading() {
+  if (!loadingOverlay) return;
+  loadingOverlay.classList.add("hidden");
+}
 
 // DOM
 const randomBtn = document.getElementById("randomBtn");
@@ -70,6 +87,8 @@ function bindEvents() {
 // 데이터 로드
 async function loadData() {
   try {
+    showLoading("맛집 리스트 불러오는 중...");
+
     const cacheBuster = Date.now();
 
     const [restaurantRes, ratingRes] = await Promise.all([
@@ -91,15 +110,15 @@ async function loadData() {
 
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
 
-    console.log("merge 후 allRestaurants:", allRestaurants);
-
     populateCategoryFilter(allRestaurants);
     renderTagFilters(allRestaurants);
     applyFilters();
   } catch (error) {
     console.error("데이터 로드 실패:", error);
-    restaurantList.innerHTML = `<p>데이터를 불러오지 못했어요 😢</p>`;
+    restaurantList.innerHTML = `<p>데이터를 불러오지 못했어 😢</p>`;
     emptyState.classList.add("hidden");
+  } finally {
+    hideLoading();
   }
 }
 
@@ -461,12 +480,14 @@ async function handleAddRestaurant(event) {
   const naverMapUrl = mapUrlInput.value.trim();
 
   if (!name) {
-    alert("가게 이름은 꼭 입력해줘!");
+    alert("가게 이름은 꼭 입력해주세!");
     nameInput.focus();
     return;
   }
 
   try {
+    showLoading("맛집 추가하는 중...");
+
     const response = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
@@ -488,22 +509,26 @@ async function handleAddRestaurant(event) {
       return;
     }
 
-    alert("맛집 추가 완료!");
     addRestaurantForm.reset();
     await loadData();
+    alert("맛집 추가 완료!");
   } catch (error) {
     console.error("맛집 추가 실패:", error);
-    alert("맛집 추가 중 오류가 발생했어.");
+    alert("맛집 추가 중 오류가 발생했어요.");
+  } finally {
+    hideLoading();
   }
 }
 
 // 평점 등록
 async function handleRateRestaurant(restaurantId, rating) {
-  const createdBy = prompt("이름을 입력해줘! (취소하면 익명)") || "익명";
-  const memoInput = prompt("한줄 후기를 남길래? (취소하면 빈칸)");
+  const createdBy = prompt("이름을 입력해주세요! (취소하면 익명)") || "익명";
+  const memoInput = prompt("한줄 후기를 남겨주실래? (취소하면 빈칸)");
   const memo = memoInput === null ? "" : memoInput.trim();
 
   try {
+    showLoading("평점 등록하는 중...");
+
     const response = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
@@ -526,7 +551,9 @@ async function handleRateRestaurant(restaurantId, rating) {
     alert("평점 등록 완료!");
   } catch (error) {
     console.error("평점 등록 실패:", error);
-    alert("평점 등록 중 오류가 발생했어.");
+    alert("평점 등록 중 오류가 발생했어요.");
+  } finally {
+    hideLoading();
   }
 }
 
