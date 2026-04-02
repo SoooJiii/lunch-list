@@ -89,28 +89,36 @@ async function loadData() {
     const restaurants = Array.isArray(restaurantJson.data) ? restaurantJson.data : [];
     const ratings = Array.isArray(ratingJson.data) ? ratingJson.data : [];
 
-    console.log("restaurants:", restaurants);
-    console.log("ratings:", ratings);
-
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
+
+    console.log("merge 후 allRestaurants:", allRestaurants);
 
     populateCategoryFilter(allRestaurants);
     renderTagFilters(allRestaurants);
     applyFilters();
   } catch (error) {
     console.error("데이터 로드 실패:", error);
-    restaurantList.innerHTML = `<p>데이터를 불러오지 못했어 😢</p>`;
+    restaurantList.innerHTML = `<p>데이터를 불러오지 못했어요 😢</p>`;
     emptyState.classList.add("hidden");
   }
 }
 
 // 맛집 + 평점 합치기
+function normalizeId(value) {
+  return String(value ?? "")
+    .trim()
+    .replace(/\.0$/, "");
+}
+
 function mergeRestaurantAndRatings(restaurants, ratings) {
+  console.log("원본 restaurants:", restaurants);
+  console.log("원본 ratings:", ratings);
+
   return restaurants.map((restaurant) => {
-    const restaurantId = String(restaurant.id).trim();
+    const restaurantId = normalizeId(restaurant.id);
 
     const relatedRatings = ratings.filter((rating) => {
-      return String(rating.restaurantId).trim() === restaurantId;
+      return normalizeId(rating.restaurantId) === restaurantId;
     });
 
     const validScores = relatedRatings
@@ -121,9 +129,9 @@ function mergeRestaurantAndRatings(restaurants, ratings) {
       ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
       : 0;
 
-    return {
+    const merged = {
       ...restaurant,
-      id: Number(restaurant.id) || restaurant.id,
+      id: restaurantId,
       name: String(restaurant.name || "").trim(),
       category: String(restaurant.category || "").trim(),
       price: Number(restaurant.price) || 0,
@@ -136,9 +144,14 @@ function mergeRestaurantAndRatings(restaurants, ratings) {
       ratingCount: validScores.length,
       avgRating
     };
+
+    console.log(
+      `[merge] restaurant.id=${restaurantId}, relatedRatings=${relatedRatings.length}, avg=${avgRating}`
+    );
+
+    return merged;
   });
 }
-
 // 태그 파싱
 function parseTags(tags) {
   if (!tags) return [];
@@ -495,7 +508,7 @@ async function handleAddRestaurant(event) {
 // 평점 등록
 async function handleRateRestaurant(restaurantId, rating) {
   const createdBy = prompt("이름을 입력해주세요! (취소하면 익명)") || "익명";
-  const memoInput = prompt("한줄평을 남겨주세요! (취소하면 빈칸)");
+  const memoInput = prompt("한줄 후기를 남겨주세요! (취소하면 빈칸)");
   const memo = memoInput === null ? "" : memoInput.trim();
 
   try {
@@ -503,7 +516,7 @@ async function handleRateRestaurant(restaurantId, rating) {
       method: "POST",
       body: JSON.stringify({
         action: "addRating",
-        restaurantId: String(restaurantId).trim(),
+        restaurantId: normalizeId(restaurantId),
         rating: Number(rating),
         memo,
         createdBy
@@ -518,13 +531,14 @@ async function handleRateRestaurant(restaurantId, rating) {
       return;
     }
 
-    alert("평점 등록 완료!");
     await loadData();
+    alert("평점 등록 완료!");
   } catch (error) {
     console.error("평점 등록 실패:", error);
     alert("평점 등록 중 오류가 발생했어요.");
   }
 }
+
 // 별 문자열
 function makeStars(avgRating) {
   const rounded = Math.round(avgRating);
