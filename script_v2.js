@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycby61sHSYBk3RAFQt7Aqqs-rbuxVel8aq2ISsDom7viFzc0bh_LZi7DId8wrW4EHSne0/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwYNOTfZrGIHK05R9z4qc2EhnzEYcJYnVuXDO5Lz0-4_zY2vu8LY2ntgez6B5Kcv2Nr/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
@@ -111,9 +111,6 @@ function normalizeId(value) {
 }
 
 function mergeRestaurantAndRatings(restaurants, ratings) {
-  console.log("원본 restaurants:", restaurants);
-  console.log("원본 ratings:", ratings);
-
   return restaurants.map((restaurant) => {
     const restaurantId = normalizeId(restaurant.id);
 
@@ -129,7 +126,7 @@ function mergeRestaurantAndRatings(restaurants, ratings) {
       ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
       : 0;
 
-    const merged = {
+    return {
       ...restaurant,
       id: restaurantId,
       name: String(restaurant.name || "").trim(),
@@ -144,14 +141,9 @@ function mergeRestaurantAndRatings(restaurants, ratings) {
       ratingCount: validScores.length,
       avgRating
     };
-
-    console.log(
-      `[merge] restaurant.id=${restaurantId}, relatedRatings=${relatedRatings.length}, avg=${avgRating}`
-    );
-
-    return merged;
   });
 }
+
 // 태그 파싱
 function parseTags(tags) {
   if (!tags) return [];
@@ -507,8 +499,8 @@ async function handleAddRestaurant(event) {
 
 // 평점 등록
 async function handleRateRestaurant(restaurantId, rating) {
-  const createdBy = prompt("이름을 입력해주세요! (취소하면 익명)") || "익명";
-  const memoInput = prompt("한줄 후기를 남겨주세요! (취소하면 빈칸)");
+  const createdBy = prompt("이름을 입력해줘! (취소하면 익명)") || "익명";
+  const memoInput = prompt("한줄 후기를 남길래? (취소하면 빈칸)");
   const memo = memoInput === null ? "" : memoInput.trim();
 
   try {
@@ -524,7 +516,6 @@ async function handleRateRestaurant(restaurantId, rating) {
     });
 
     const result = await response.json();
-    console.log("addRating result:", result);
 
     if (!result.success) {
       alert(`평점 등록 실패: ${result.message || "알 수 없는 오류"}`);
@@ -535,7 +526,7 @@ async function handleRateRestaurant(restaurantId, rating) {
     alert("평점 등록 완료!");
   } catch (error) {
     console.error("평점 등록 실패:", error);
-    alert("평점 등록 중 오류가 발생했어요.");
+    alert("평점 등록 중 오류가 발생했어.");
   }
 }
 
