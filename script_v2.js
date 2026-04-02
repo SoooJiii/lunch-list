@@ -1,55 +1,74 @@
-const API_URL = "https://script.google.com/macros/s/AKfycby61sHSYBk3RAFQt7Aqqs-rbuxVel8aq2ISsDom7viFzc0bh_LZi7DId8wrW4EHSne0/exec";
+const API_URL = "여기에_네_앱스스크립트_웹앱_URL_넣기";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
+let selectedTags = new Set();
 
 // DOM
-const restaurantListEl = document.getElementById("restaurant-list");
-const categoryFilterEl = document.getElementById("category-filter");
-const tagFilterEl = document.getElementById("tag-filter");
-const sortFilterEl = document.getElementById("sort-filter");
-const randomButtonEl = document.getElementById("random-button");
+const randomBtn = document.getElementById("randomBtn");
+const randomResult = document.getElementById("randomResult");
+const randomName = document.getElementById("randomName");
+const randomMeta = document.getElementById("randomMeta");
+const randomComment = document.getElementById("randomComment");
+const randomMapLink = document.getElementById("randomMapLink");
 
-const addFormEl = document.getElementById("add-restaurant-form");
-const nameEl = document.getElementById("name");
-const categoryEl = document.getElementById("category");
-const priceEl = document.getElementById("price");
-const commentEl = document.getElementById("comment");
-const tagsEl = document.getElementById("tags");
-const mapUrlEl = document.getElementById("naverMapUrl");
-const createdByEl = document.getElementById("createdBy");
+const addRestaurantForm = document.getElementById("addRestaurantForm");
+const nameInput = document.getElementById("nameInput");
+const categoryInput = document.getElementById("categoryInput");
+const priceInput = document.getElementById("priceInput");
+const createdByInput = document.getElementById("createdByInput");
+const commentInput = document.getElementById("commentInput");
+const tagsInput = document.getElementById("tagsInput");
+const mapUrlInput = document.getElementById("mapUrlInput");
 
-// 초기 실행
+const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const sortFilter = document.getElementById("sortFilter");
+const tagFilters = document.getElementById("tagFilters");
+const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+
+const resultCount = document.getElementById("resultCount");
+const activeFilterText = document.getElementById("activeFilterText");
+
+const restaurantList = document.getElementById("restaurantList");
+const emptyState = document.getElementById("emptyState");
+const restaurantCardTemplate = document.getElementById("restaurantCardTemplate");
+
+// 시작
 document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
-  await loadRestaurants();
+  await loadData();
 });
 
 // 이벤트 연결
 function bindEvents() {
-  if (categoryFilterEl) {
-    categoryFilterEl.addEventListener("change", applyFilters);
+  if (randomBtn) {
+    randomBtn.addEventListener("click", handleRandomPick);
   }
 
-  if (tagFilterEl) {
-    tagFilterEl.addEventListener("input", applyFilters);
+  if (searchInput) {
+    searchInput.addEventListener("input", applyFilters);
   }
 
-  if (sortFilterEl) {
-    sortFilterEl.addEventListener("change", applyFilters);
+  if (categoryFilter) {
+    categoryFilter.addEventListener("change", applyFilters);
   }
 
-  if (randomButtonEl) {
-    randomButtonEl.addEventListener("click", pickRandomRestaurant);
+  if (sortFilter) {
+    sortFilter.addEventListener("change", applyFilters);
   }
 
-  if (addFormEl) {
-    addFormEl.addEventListener("submit", handleAddRestaurant);
+  if (resetFiltersBtn) {
+    resetFiltersBtn.addEventListener("click", resetFilters);
+  }
+
+  if (addRestaurantForm) {
+    addRestaurantForm.addEventListener("submit", handleAddRestaurant);
   }
 }
 
 // 데이터 로드
-async function loadRestaurants() {
+async function loadData() {
   try {
     const [restaurantRes, ratingRes] = await Promise.all([
       fetch(`${API_URL}?action=getRestaurants`),
@@ -65,12 +84,12 @@ async function loadRestaurants() {
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
 
     populateCategoryFilter(allRestaurants);
+    renderTagFilters(allRestaurants);
     applyFilters();
   } catch (error) {
     console.error("데이터 로드 실패:", error);
-    if (restaurantListEl) {
-      restaurantListEl.innerHTML = `<p>데이터를 불러오지 못했어 😢</p>`;
-    }
+    restaurantList.innerHTML = `<p>데이터를 불러오지 못했어 😢</p>`;
+    emptyState.classList.add("hidden");
   }
 }
 
@@ -81,64 +100,122 @@ function mergeRestaurantAndRatings(restaurants, ratings) {
       (rating) => String(rating.restaurantId) === String(restaurant.id)
     );
 
-    const ratingNumbers = relatedRatings
+    const validScores = relatedRatings
       .map((rating) => Number(rating.rating))
-      .filter((num) => !isNaN(num) && num > 0);
+      .filter((score) => !isNaN(score) && score >= 1 && score <= 5);
 
-    const avgRating =
-      ratingNumbers.length > 0
-        ? (ratingNumbers.reduce((sum, cur) => sum + cur, 0) / ratingNumbers.length).toFixed(1)
-        : "0.0";
+    const avgRating = validScores.length
+      ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
+      : 0;
 
     return {
       ...restaurant,
+      id: Number(restaurant.id) || restaurant.id,
+      name: String(restaurant.name || "").trim(),
+      category: String(restaurant.category || "").trim(),
       price: Number(restaurant.price) || 0,
-      avgRating: Number(avgRating),
-      ratingCount: ratingNumbers.length,
-      ratings: relatedRatings
+      comment: String(restaurant.comment || "").trim(),
+      tags: String(restaurant.tags || "").trim(),
+      naverMapUrl: String(restaurant.naverMapUrl || "").trim(),
+      createdBy: String(restaurant.createdBy || "익명").trim(),
+      tagArray: parseTags(restaurant.tags),
+      ratings: relatedRatings,
+      ratingCount: validScores.length,
+      avgRating
     };
   });
 }
 
+// 태그 파싱
+function parseTags(tags) {
+  if (!tags) return [];
+  return String(tags)
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
+
 // 카테고리 필터 채우기
 function populateCategoryFilter(data) {
-  if (!categoryFilterEl) return;
-
-  const currentValue = categoryFilterEl.value;
+  const currentValue = categoryFilter.value;
   const categories = [...new Set(data.map((item) => item.category).filter(Boolean))];
 
-  categoryFilterEl.innerHTML = `<option value="">전체 카테고리</option>`;
+  categoryFilter.innerHTML = `<option value="all">전체</option>`;
 
   categories.forEach((category) => {
     const option = document.createElement("option");
     option.value = category;
     option.textContent = category;
-    categoryFilterEl.appendChild(option);
+    categoryFilter.appendChild(option);
   });
 
-  if ([...categoryFilterEl.options].some((opt) => opt.value === currentValue)) {
-    categoryFilterEl.value = currentValue;
+  if ([...categoryFilter.options].some((option) => option.value === currentValue)) {
+    categoryFilter.value = currentValue;
   }
 }
 
-// 필터 + 정렬 적용
+// 태그 필터 렌더링
+function renderTagFilters(data) {
+  const allTags = [...new Set(data.flatMap((item) => item.tagArray))];
+
+  tagFilters.innerHTML = "";
+
+  allTags.forEach((tag) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tag-chip";
+    button.textContent = tag;
+
+    if (selectedTags.has(tag)) {
+      button.classList.add("active");
+    }
+
+    button.addEventListener("click", () => {
+      if (selectedTags.has(tag)) {
+        selectedTags.delete(tag);
+      } else {
+        selectedTags.add(tag);
+      }
+
+      renderTagFilters(allRestaurants);
+      applyFilters();
+    });
+
+    tagFilters.appendChild(button);
+  });
+}
+
+// 필터 적용
 function applyFilters() {
+  const searchKeyword = searchInput.value.trim().toLowerCase();
+  const selectedCategory = categoryFilter.value;
+  const sortValue = sortFilter.value;
+
   let result = [...allRestaurants];
 
-  const selectedCategory = categoryFilterEl ? categoryFilterEl.value.trim() : "";
-  const tagKeyword = tagFilterEl ? tagFilterEl.value.trim().toLowerCase() : "";
-  const sortValue = sortFilterEl ? sortFilterEl.value : "";
+  // 검색
+  if (searchKeyword) {
+    result = result.filter((item) => {
+      const name = item.name.toLowerCase();
+      const comment = item.comment.toLowerCase();
+      const tags = item.tags.toLowerCase();
+      return (
+        name.includes(searchKeyword) ||
+        comment.includes(searchKeyword) ||
+        tags.includes(searchKeyword)
+      );
+    });
+  }
 
-  // 카테고리 필터
-  if (selectedCategory) {
+  // 카테고리
+  if (selectedCategory !== "all") {
     result = result.filter((item) => item.category === selectedCategory);
   }
 
-  // 태그 필터
-  if (tagKeyword) {
+  // 태그
+  if (selectedTags.size > 0) {
     result = result.filter((item) => {
-      const tags = String(item.tags || "").toLowerCase();
-      return tags.includes(tagKeyword);
+      return [...selectedTags].every((tag) => item.tagArray.includes(tag));
     });
   }
 
@@ -150,183 +227,224 @@ function applyFilters() {
     case "priceDesc":
       result.sort((a, b) => b.price - a.price);
       break;
+    case "nameAsc":
+      result.sort((a, b) => a.name.localeCompare(b.name, "ko"));
+      break;
     case "ratingDesc":
-      result.sort((a, b) => b.avgRating - a.avgRating);
+      result.sort((a, b) => {
+        if (b.avgRating === a.avgRating) return b.ratingCount - a.ratingCount;
+        return b.avgRating - a.avgRating;
+      });
       break;
     case "ratingCountDesc":
-      result.sort((a, b) => b.ratingCount - a.ratingCount);
+      result.sort((a, b) => {
+        if (b.ratingCount === a.ratingCount) return b.avgRating - a.avgRating;
+        return b.ratingCount - a.ratingCount;
+      });
       break;
-    case "nameAsc":
-      result.sort((a, b) => String(a.name).localeCompare(String(b.name), "ko"));
-      break;
+    case "default":
     default:
-      // 기본은 id 오름차순
       result.sort((a, b) => Number(a.id) - Number(b.id));
       break;
   }
 
   filteredRestaurants = result;
+  updateSummary();
   renderRestaurants(filteredRestaurants);
 }
 
-// 목록 렌더링
+// 카드 렌더링
 function renderRestaurants(data) {
-  if (!restaurantListEl) return;
+  restaurantList.innerHTML = "";
 
   if (!data.length) {
-    restaurantListEl.innerHTML = `<p>조건에 맞는 맛집이 없어 😢</p>`;
+    emptyState.classList.remove("hidden");
     return;
   }
 
-  const html = data
-    .map((item) => {
-      const safeMapUrl = escapeHtml(item.naverMapUrl || "");
-      const safeName = escapeHtml(item.name || "");
-      const safeCategory = escapeHtml(item.category || "");
-      const safeComment = escapeHtml(item.comment || "");
-      const safeTags = escapeHtml(item.tags || "");
-      const safeCreatedBy = escapeHtml(item.createdBy || "익명");
+  emptyState.classList.add("hidden");
 
-      return `
-        <div class="restaurant-card">
-          <div class="restaurant-header">
-            <h3>${safeName}</h3>
-            <div class="restaurant-meta">
-              <span class="badge">${safeCategory}</span>
-              <span class="badge">₩ ${formatNumber(item.price)}</span>
-            </div>
-          </div>
+  data.forEach((restaurant) => {
+    const fragment = restaurantCardTemplate.content.cloneNode(true);
 
-          <p class="restaurant-comment">${safeComment}</p>
+    const cardTitle = fragment.querySelector(".card-title");
+    const cardCategory = fragment.querySelector(".card-category");
+    const cardPrice = fragment.querySelector(".card-price");
+    const cardComment = fragment.querySelector(".card-comment");
+    const cardTags = fragment.querySelector(".card-tags");
+    const staticStars = fragment.querySelector(".static-stars");
+    const ratingScore = fragment.querySelector(".rating-score");
+    const ratingButtons = fragment.querySelector(".rating-buttons");
+    const reviewSummary = fragment.querySelector(".review-summary");
+    const reviewList = fragment.querySelector(".review-list");
+    const cardCreatedBy = fragment.querySelector(".card-created-by");
+    const mapLink = fragment.querySelector(".map-link");
 
-          <p class="restaurant-tags">
-            <strong>태그:</strong> ${safeTags || "-"}
-          </p>
+    cardTitle.textContent = restaurant.name || "-";
+    cardCategory.textContent = restaurant.category || "카테고리 없음";
+    cardPrice.textContent = restaurant.price ? `₩ ${formatNumber(restaurant.price)}` : "가격 정보 없음";
+    cardComment.textContent = restaurant.comment || "설명 없음";
+    cardCreatedBy.textContent = `등록자: ${restaurant.createdBy || "익명"}`;
 
-          <p class="restaurant-rating-summary">
-            <strong>평균 평점:</strong> ${renderStaticStars(item.avgRating)}
-            <span>${item.avgRating.toFixed(1)} / 5</span>
-            <span>(${item.ratingCount}명)</span>
-          </p>
+    staticStars.textContent = makeStars(restaurant.avgRating);
+    ratingScore.textContent = `${restaurant.avgRating.toFixed(1)} / 5 (${restaurant.ratingCount}명)`;
 
-          <div class="rating-input-area">
-            <span><strong>평점 남기기:</strong></span>
-            <div class="star-buttons">
-              ${renderRatingButtons(item.id)}
-            </div>
-          </div>
+    // 태그
+    cardTags.innerHTML = "";
+    if (restaurant.tagArray.length > 0) {
+      restaurant.tagArray.forEach((tag) => {
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = `#${tag}`;
+        cardTags.appendChild(span);
+      });
+    } else {
+      const emptyTag = document.createElement("span");
+      emptyTag.className = "tag empty";
+      emptyTag.textContent = "#태그없음";
+      cardTags.appendChild(emptyTag);
+    }
 
-          ${
-            safeMapUrl
-              ? `<p><a href="${safeMapUrl}" target="_blank" rel="noopener noreferrer">네이버지도 보기</a></p>`
-              : ""
-          }
+    // 평점 버튼
+    ratingButtons.innerHTML = "";
+    for (let i = 1; i <= 5; i++) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "star-rate-btn";
+      button.textContent = `${i}★`;
+      button.addEventListener("click", () => handleRateRestaurant(restaurant.id, i));
+      ratingButtons.appendChild(button);
+    }
 
-          <p class="restaurant-created-by">
-            <small>등록자: ${safeCreatedBy}</small>
-          </p>
+    // 후기
+    reviewSummary.textContent = `후기 보기 (${restaurant.ratings.length})`;
+    reviewList.innerHTML = "";
 
-          <details class="rating-history">
-            <summary>후기 보기 (${item.ratings.length})</summary>
-            ${renderRatingHistory(item.ratings)}
-          </details>
-        </div>
-      `;
-    })
-    .join("");
+    if (restaurant.ratings.length === 0) {
+      const emptyReview = document.createElement("p");
+      emptyReview.className = "review-empty";
+      emptyReview.textContent = "아직 후기가 없어.";
+      reviewList.appendChild(emptyReview);
+    } else {
+      restaurant.ratings
+        .slice()
+        .sort((a, b) => {
+          const dateA = new Date(a.createdAt).getTime() || 0;
+          const dateB = new Date(b.createdAt).getTime() || 0;
+          return dateB - dateA;
+        })
+        .forEach((review) => {
+          const item = document.createElement("div");
+          item.className = "review-item";
 
-  restaurantListEl.innerHTML = html;
+          const writer = escapeHtml(review.createdBy || "익명");
+          const memo = escapeHtml(review.memo || "");
+          const score = Number(review.rating) || 0;
+          const date = formatDate(review.createdAt);
+
+          item.innerHTML = `
+            <p class="review-stars">${"★".repeat(score)}${"☆".repeat(5 - score)}</p>
+            <p class="review-memo">${memo || "한줄 후기는 없음"}</p>
+            <p class="review-meta">${writer} · ${date}</p>
+          `;
+
+          reviewList.appendChild(item);
+        });
+    }
+
+    // 지도 링크
+    if (restaurant.naverMapUrl) {
+      mapLink.href = restaurant.naverMapUrl;
+      mapLink.style.display = "";
+    } else {
+      mapLink.removeAttribute("href");
+      mapLink.style.display = "none";
+    }
+
+    restaurantList.appendChild(fragment);
+  });
 }
 
-// 고정 별 표시
-function renderStaticStars(avgRating) {
-  const rounded = Math.round(avgRating);
-  let stars = "";
+// 요약 바 업데이트
+function updateSummary() {
+  resultCount.textContent = `총 ${filteredRestaurants.length}곳`;
 
-  for (let i = 1; i <= 5; i++) {
-    stars += i <= rounded ? "★" : "☆";
+  const searchKeyword = searchInput.value.trim();
+  const selectedCategory = categoryFilter.value;
+  const tags = [...selectedTags];
+
+  const parts = [];
+
+  if (searchKeyword) {
+    parts.push(`"${searchKeyword}" 검색`);
   }
 
-  return `<span class="static-stars">${stars}</span>`;
-}
-
-// 클릭용 별 버튼
-function renderRatingButtons(restaurantId) {
-  let html = "";
-
-  for (let i = 1; i <= 5; i++) {
-    html += `
-      <button type="button" class="star-button" onclick="submitRating(${restaurantId}, ${i})">
-        ${i}★
-      </button>
-    `;
+  if (selectedCategory !== "all") {
+    parts.push(`${selectedCategory} 카테고리`);
   }
 
-  return html;
-}
-
-// 후기 목록 렌더링
-function renderRatingHistory(ratings) {
-  if (!ratings || !ratings.length) {
-    return `<p>아직 후기가 없어.</p>`;
+  if (tags.length > 0) {
+    parts.push(`태그 ${tags.map((tag) => `#${tag}`).join(", ")}`);
   }
 
-  const html = ratings
-    .slice()
-    .reverse()
-    .map((rating) => {
-      const createdBy = escapeHtml(rating.createdBy || "익명");
-      const memo = escapeHtml(rating.memo || "");
-      const score = Number(rating.rating) || 0;
-      const createdAt = formatDate(rating.createdAt);
-
-      return `
-        <div class="rating-item">
-          <p><strong>${"★".repeat(score)}${"☆".repeat(5 - score)}</strong></p>
-          <p>${memo || "-"}</p>
-          <p><small>${createdBy} · ${createdAt}</small></p>
-        </div>
-      `;
-    })
-    .join("");
-
-  return `<div class="rating-list">${html}</div>`;
+  if (parts.length === 0) {
+    activeFilterText.textContent = "전체 맛집을 보여주는 중";
+  } else {
+    activeFilterText.textContent = `${parts.join(" / ")} 조건으로 보는 중`;
+  }
 }
 
 // 랜덤 추천
-function pickRandomRestaurant() {
+function handleRandomPick() {
   if (!filteredRestaurants.length) {
-    alert("추천할 맛집이 없어!");
+    alert("추천할 맛집이 없어 😢");
     return;
   }
 
-  const randomIndex = Math.floor(Math.random() * filteredRestaurants.length);
-  const picked = filteredRestaurants[randomIndex];
+  const picked = filteredRestaurants[Math.floor(Math.random() * filteredRestaurants.length)];
 
-  alert(
-    `오늘의 추천 맛집 🍽️\n\n` +
-      `이름: ${picked.name}\n` +
-      `카테고리: ${picked.category}\n` +
-      `가격: ₩ ${formatNumber(picked.price)}\n` +
-      `평균평점: ${picked.avgRating.toFixed(1)} (${picked.ratingCount}명)\n` +
-      `설명: ${picked.comment || "-"}`
-  );
+  randomName.textContent = picked.name || "이름 없음";
+  randomMeta.textContent = `${picked.category || "카테고리 없음"} · ₩ ${formatNumber(picked.price)} · 평점 ${picked.avgRating.toFixed(1)} (${picked.ratingCount}명)`;
+  randomComment.textContent = picked.comment || "설명 없음";
+
+  if (picked.naverMapUrl) {
+    randomMapLink.href = picked.naverMapUrl;
+    randomMapLink.style.display = "";
+  } else {
+    randomMapLink.removeAttribute("href");
+    randomMapLink.style.display = "none";
+  }
+
+  randomResult.classList.remove("hidden");
+  randomResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+// 필터 초기화
+function resetFilters() {
+  searchInput.value = "";
+  categoryFilter.value = "all";
+  sortFilter.value = "default";
+  selectedTags.clear();
+
+  renderTagFilters(allRestaurants);
+  applyFilters();
 }
 
 // 맛집 추가
-async function handleAddRestaurant(e) {
-  e.preventDefault();
+async function handleAddRestaurant(event) {
+  event.preventDefault();
 
-  const name = nameEl ? nameEl.value.trim() : "";
-  const category = categoryEl ? categoryEl.value.trim() : "";
-  const price = priceEl ? priceEl.value.trim() : "";
-  const comment = commentEl ? commentEl.value.trim() : "";
-  const tags = tagsEl ? tagsEl.value.trim() : "";
-  const naverMapUrl = mapUrlEl ? mapUrlEl.value.trim() : "";
-  const createdBy = createdByEl ? createdByEl.value.trim() : "";
+  const name = nameInput.value.trim();
+  const category = categoryInput.value.trim();
+  const price = priceInput.value.trim();
+  const createdBy = createdByInput.value.trim();
+  const comment = commentInput.value.trim();
+  const tags = tagsInput.value.trim();
+  const naverMapUrl = mapUrlInput.value.trim();
 
   if (!name) {
     alert("가게 이름은 꼭 입력해줘!");
+    nameInput.focus();
     return;
   }
 
@@ -348,23 +466,25 @@ async function handleAddRestaurant(e) {
     const result = await response.json();
 
     if (!result.success) {
-      alert("맛집 추가 실패: " + (result.message || "알 수 없는 오류"));
+      alert(`맛집 추가 실패: ${result.message || "알 수 없는 오류"}`);
       return;
     }
 
     alert("맛집 추가 완료!");
-    addFormEl.reset();
-    await loadRestaurants();
+    addRestaurantForm.reset();
+    await loadData();
   } catch (error) {
     console.error("맛집 추가 실패:", error);
     alert("맛집 추가 중 오류가 발생했어.");
   }
 }
 
-// 평점 추가
-async function submitRating(restaurantId, rating) {
-  const createdBy = prompt("이름을 입력해줘! (취소하면 익명)");
-  const memo = prompt("한줄 후기 남길래? (취소해도 됨)");
+// 평점 등록
+async function handleRateRestaurant(restaurantId, rating) {
+  const createdBy = prompt("이름을 입력해줘! (취소하면 익명)") || "익명";
+  const memoInput = prompt("한줄 후기를 남길래? (취소하면 빈칸)");
+
+  const memo = memoInput === null ? "" : memoInput.trim();
 
   try {
     const response = await fetch(API_URL, {
@@ -373,24 +493,36 @@ async function submitRating(restaurantId, rating) {
         action: "addRating",
         restaurantId,
         rating,
-        memo: memo || "",
-        createdBy: createdBy || "익명"
+        memo,
+        createdBy
       })
     });
 
     const result = await response.json();
 
     if (!result.success) {
-      alert("평점 등록 실패: " + (result.message || "알 수 없는 오류"));
+      alert(`평점 등록 실패: ${result.message || "알 수 없는 오류"}`);
       return;
     }
 
     alert("평점 등록 완료!");
-    await loadRestaurants();
+    await loadData();
   } catch (error) {
     console.error("평점 등록 실패:", error);
     alert("평점 등록 중 오류가 발생했어.");
   }
+}
+
+// 별 문자열
+function makeStars(avgRating) {
+  const rounded = Math.round(avgRating);
+  let stars = "";
+
+  for (let i = 1; i <= 5; i++) {
+    stars += i <= rounded ? "★" : "☆";
+  }
+
+  return stars;
 }
 
 // 숫자 포맷
