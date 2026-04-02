@@ -1,5 +1,5 @@
 const loadingOverlay = document.getElementById("loadingOverlay");
-const API_URL = "https://script.google.com/macros/s/AKfycby_QF3k90oiUVextwZDD7WdpVlQfnzHNf7XGxhcll4gd-Bscwb3rqnz_WE7injPvVRX/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyap-ZOHGgE04uPZMdzN9nxQE1f82WgS0m6EF6YnbfucKvcrY_4VHHJK2weIHKphUnd/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
@@ -89,9 +89,7 @@ async function loadData() {
   try {
     showLoading("맛집 리스트 불러오는 중...");
 
-    const cacheBuster = Date.now();
-
-    const response = await fetch(`${API_URL}?action=getAllData&t=${cacheBuster}`, {
+    const response = await fetch(`${API_URL}?action=getAllData`, {
       method: "GET",
       cache: "no-store"
     });
@@ -108,7 +106,7 @@ async function loadData() {
     applyFilters();
   } catch (error) {
     console.error("데이터 로드 실패:", error);
-    restaurantList.innerHTML = `<p>데이터를 불러오지 못했어 😢</p>`;
+    restaurantList.innerHTML = `<p>데이터를 불러오지 못했어요 😢</p>`;
     emptyState.classList.add("hidden");
   } finally {
     hideLoading();
