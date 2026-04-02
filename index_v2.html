@@ -42,17 +42,24 @@
       <a id="randomMapLink" class="map-link" href="#" target="_blank" rel="noopener noreferrer">네이버지도 보기</a>
     </section>
 
-    <section class="panel add-panel">
-      <div class="section-title-wrap">
-        <h2>맛집 추가</h2>
-        <p>맛집을 직접 등록해주세요!</p>
+   <section class="panel add-panel">
+  <details class="add-accordion">
+    <summary class="add-accordion__summary">
+      <div class="section-title-wrap summary-title">
+        <div>
+          <h2>맛집 추가</h2>
+          <p>팀원들이 같이 맛집을 등록할 수 있어</p>
+        </div>
+        <span class="accordion-hint">눌러서 펼치기</span>
       </div>
+    </summary>
 
+    <div class="add-accordion__content">
       <form id="addRestaurantForm" class="add-form">
         <div class="form-grid">
           <div class="form-group">
             <label for="nameInput">가게 이름 *</label>
-            <input type="text" id="nameInput" placeholder="예: 보영만두" required />
+            <input type="text" id="nameInput" placeholder="예: 부자돈까스" required />
           </div>
 
           <div class="form-group">
@@ -90,7 +97,9 @@
           <button type="submit" class="primary-btn">맛집 추가하기</button>
         </div>
       </form>
-    </section>
+    </div>
+  </details>
+</section>
 
     <section class="filters panel">
       <div class="section-title-wrap">
