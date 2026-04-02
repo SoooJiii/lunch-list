@@ -70,9 +70,17 @@ function bindEvents() {
 // 데이터 로드
 async function loadData() {
   try {
+    const cacheBuster = Date.now();
+
     const [restaurantRes, ratingRes] = await Promise.all([
-      fetch(`${API_URL}?action=getRestaurants`),
-      fetch(`${API_URL}?action=getRatings`)
+      fetch(`${API_URL}?action=getRestaurants&t=${cacheBuster}`, {
+        method: "GET",
+        cache: "no-store"
+      }),
+      fetch(`${API_URL}?action=getRatings&t=${cacheBuster}`, {
+        method: "GET",
+        cache: "no-store"
+      })
     ]);
 
     const restaurantJson = await restaurantRes.json();
@@ -80,6 +88,9 @@ async function loadData() {
 
     const restaurants = Array.isArray(restaurantJson.data) ? restaurantJson.data : [];
     const ratings = Array.isArray(ratingJson.data) ? ratingJson.data : [];
+
+    console.log("restaurants:", restaurants);
+    console.log("ratings:", ratings);
 
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
 
@@ -96,9 +107,11 @@ async function loadData() {
 // 맛집 + 평점 합치기
 function mergeRestaurantAndRatings(restaurants, ratings) {
   return restaurants.map((restaurant) => {
-    const relatedRatings = ratings.filter(
-      (rating) => String(rating.restaurantId) === String(restaurant.id)
-    );
+    const restaurantId = String(restaurant.id).trim();
+
+    const relatedRatings = ratings.filter((rating) => {
+      return String(rating.restaurantId).trim() === restaurantId;
+    });
 
     const validScores = relatedRatings
       .map((rating) => Number(rating.rating))
@@ -481,9 +494,8 @@ async function handleAddRestaurant(event) {
 
 // 평점 등록
 async function handleRateRestaurant(restaurantId, rating) {
-  const createdBy = prompt("이름을 입력해줘! (취소하면 익명)") || "익명";
-  const memoInput = prompt("한줄 후기를 남길래? (취소하면 빈칸)");
-
+  const createdBy = prompt("이름을 입력해주세요! (취소하면 익명)") || "익명";
+  const memoInput = prompt("한줄평을 남겨주세요! (취소하면 빈칸)");
   const memo = memoInput === null ? "" : memoInput.trim();
 
   try {
@@ -491,14 +503,15 @@ async function handleRateRestaurant(restaurantId, rating) {
       method: "POST",
       body: JSON.stringify({
         action: "addRating",
-        restaurantId,
-        rating,
+        restaurantId: String(restaurantId).trim(),
+        rating: Number(rating),
         memo,
         createdBy
       })
     });
 
     const result = await response.json();
+    console.log("addRating result:", result);
 
     if (!result.success) {
       alert(`평점 등록 실패: ${result.message || "알 수 없는 오류"}`);
@@ -509,10 +522,9 @@ async function handleRateRestaurant(restaurantId, rating) {
     await loadData();
   } catch (error) {
     console.error("평점 등록 실패:", error);
-    alert("평점 등록 중 오류가 발생했어.");
+    alert("평점 등록 중 오류가 발생했어요.");
   }
 }
-
 // 별 문자열
 function makeStars(avgRating) {
   const rounded = Math.round(avgRating);
