@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>종로 점심 맛집 리스트</title>
-    <link rel="stylesheet" href="style.css?1" />
+    <link rel="stylesheet" href="style.css?2" />
   </head>
   <body>
     <div class="container">
@@ -257,6 +257,77 @@
         </div>
       </article>
     </template>
+
+    <div id="ratingModal" class="modal hidden">
+      <div class="modal-backdrop" data-close="ratingModal"></div>
+
+      <div class="modal-content">
+        <button type="button" class="modal-close" data-close="ratingModal">
+          ×
+        </button>
+
+        <h3 id="ratingModalTitle">평점 남기기</h3>
+
+        <div class="modal-form">
+          <label>
+            이름
+            <input
+              type="text"
+              id="ratingCreatedBy"
+              maxlength="20"
+              placeholder="취소 시 익명 아님, 그냥 비워두면 익명"
+            />
+          </label>
+
+          <label>
+            평점
+            <select id="ratingScore">
+              <option value="5">5점</option>
+              <option value="4">4점</option>
+              <option value="3">3점</option>
+              <option value="2">2점</option>
+              <option value="1">1점</option>
+            </select>
+          </label>
+
+          <label>
+            한줄 후기
+            <textarea
+              id="ratingMemo"
+              rows="4"
+              maxlength="200"
+              placeholder="맛, 가격, 분위기 등 자유롭게"
+            ></textarea>
+          </label>
+
+          <label>
+            비밀번호
+            <input
+              type="password"
+              id="ratingPassword"
+              maxlength="4"
+              inputmode="numeric"
+              placeholder="숫자 4자리"
+            />
+          </label>
+
+          <p id="ratingModalError" class="modal-error"></p>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              data-close="ratingModal"
+            >
+              취소
+            </button>
+            <button type="button" class="btn-primary" id="ratingSubmitBtn">
+              등록
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div
       id="loadingOverlay"

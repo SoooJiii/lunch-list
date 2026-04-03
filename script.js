@@ -1,6 +1,6 @@
 const loadingOverlay = document.getElementById("loadingOverlay");
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbx9OkbjIjkX5Ckqst_STTTIkR6OBJ9QG3QlwotQt4ilHixGCf7i8wHqsOS55ePzegB8/exec";
+  "https://script.google.com/macros/s/AKfycbzZFkYz0eW31RL7eEp6VGLrYv74g9W4Nbb5RP2XnN70CYQ-gUzzpVn_gBlYvLxeRA3o/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
@@ -40,10 +40,16 @@ const restaurantCardTemplate = document.getElementById(
 
 const CACHE_KEY = "lunch_restaurant_cache_v1";
 
+const ratingModalState = {
+  mode: "create", // "create" | "edit"
+  restaurantId: null,
+  reviewId: null,
+};
+
 // 시작
 document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
-
+  initRatingModal();
   const cachedData = loadRestaurantCache();
 
   if (cachedData && cachedData.length > 0) {
@@ -59,6 +65,134 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadData();
   }
 });
+
+function openRatingModalForCreate(restaurantId, rating = 5) {
+  ratingModalState.mode = "create";
+  ratingModalState.restaurantId = normalizeId(restaurantId);
+  ratingModalState.reviewId = null;
+
+  document.getElementById("ratingModalTitle").textContent = "평점 남기기";
+  document.getElementById("ratingSubmitBtn").textContent = "등록";
+
+  document.getElementById("ratingCreatedBy").value = "";
+  document.getElementById("ratingCreatedBy").disabled = false;
+  document.getElementById("ratingScore").value = String(rating);
+  document.getElementById("ratingMemo").value = "";
+  document.getElementById("ratingPassword").value = "";
+  document.getElementById("ratingModalError").textContent = "";
+
+  document.getElementById("ratingModal").classList.remove("hidden");
+}
+
+function openRatingModalForEdit(review) {
+  ratingModalState.mode = "edit";
+  ratingModalState.restaurantId = normalizeId(review.restaurantId);
+  ratingModalState.reviewId = normalizeId(review.id);
+
+  document.getElementById("ratingModalTitle").textContent = "평점 수정하기";
+  document.getElementById("ratingSubmitBtn").textContent = "수정";
+
+  document.getElementById("ratingCreatedBy").value = review.createdBy || "익명";
+  document.getElementById("ratingCreatedBy").disabled = true;
+  document.getElementById("ratingScore").value = String(
+    Number(review.rating) || 5,
+  );
+  document.getElementById("ratingMemo").value = review.memo || "";
+  document.getElementById("ratingPassword").value = "";
+  document.getElementById("ratingModalError").textContent = "";
+
+  document.getElementById("ratingModal").classList.remove("hidden");
+}
+
+function closeRatingModal() {
+  document.getElementById("ratingModal").classList.add("hidden");
+}
+async function handleRatingModalSubmit() {
+  const createdByInput = document
+    .getElementById("ratingCreatedBy")
+    .value.trim();
+  const createdBy = createdByInput || "익명";
+  const rating = Number(document.getElementById("ratingScore").value);
+  const memo = document.getElementById("ratingMemo").value.trim();
+  const password = document.getElementById("ratingPassword").value.trim();
+  const errorEl = document.getElementById("ratingModalError");
+
+  errorEl.textContent = "";
+
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    errorEl.textContent = "평점은 1~5 사이로 선택해주세요.";
+    return;
+  }
+
+  if (!/^\d{4}$/.test(password)) {
+    errorEl.textContent = "비밀번호는 숫자 4자리로 입력해주세요.";
+    return;
+  }
+
+  try {
+    showLoading(
+      ratingModalState.mode === "create"
+        ? "평점 등록하는 중..."
+        : "평점 수정하는 중...",
+    );
+
+    let body;
+
+    if (ratingModalState.mode === "create") {
+      body = {
+        action: "addRating",
+        restaurantId: ratingModalState.restaurantId,
+        rating,
+        memo,
+        createdBy,
+        password,
+      };
+    } else {
+      body = {
+        action: "updateRating",
+        id: ratingModalState.reviewId,
+        rating,
+        memo,
+        password,
+      };
+    }
+
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      errorEl.textContent = result.message || "처리에 실패했어요.";
+      return;
+    }
+
+    closeRatingModal();
+    await loadData();
+    alert(
+      ratingModalState.mode === "create"
+        ? "평점 등록 완료!"
+        : "평점 수정 완료!",
+    );
+  } catch (error) {
+    console.error("평점 처리 실패:", error);
+    errorEl.textContent = "처리 중 오류가 발생했어요.";
+  } finally {
+    hideLoading();
+  }
+}
+
+function initRatingModal() {
+  document
+    .getElementById("ratingSubmitBtn")
+    .addEventListener("click", handleRatingModalSubmit);
+
+  document.querySelectorAll("[data-close='ratingModal']").forEach((el) => {
+    el.addEventListener("click", closeRatingModal);
+  });
+}
 
 async function loadDataSilently() {
   try {
@@ -462,7 +596,8 @@ function renderRestaurants(data) {
               <p class="review-meta">${writer} · ${date}</p>
               ${
                 canEdit
-                  ? `<button type="button" class="review-edit-btn">수정</button>`
+                  ? `<button type="button" class="review-edit-btn">수정</button>
+                      <button type="button" class="review-delete-btn">삭제</button>`
                   : ""
               }
             </div>
@@ -472,6 +607,11 @@ function renderRestaurants(data) {
             const editButton = item.querySelector(".review-edit-btn");
             editButton.addEventListener("click", () =>
               handleEditRating(review),
+            );
+
+            const deleteButton = item.querySelector(".review-delete-btn");
+            deleteButton.addEventListener("click", () =>
+              handleDeleteRating(review),
             );
           }
 
@@ -612,63 +752,28 @@ async function handleAddRestaurant(event) {
 }
 
 // 평점 등록
-async function handleRateRestaurant(restaurantId, rating) {
-  const createdBy = prompt("이름을 입력해주세요! (취소하면 익명)") || "익명";
-  const memoInput = prompt("한줄 후기를 남겨주실래요? (취소하면 빈칸)");
-  const memo = memoInput === null ? "" : memoInput.trim();
-
-  const passwordInput = prompt("수정/삭제용 비밀번호 4자리를 입력해주세요.");
-  if (passwordInput === null) {
-    alert("평점 등록이 취소됐어요.");
-    return;
-  }
-
-  const password = passwordInput.trim();
-
-  if (!/^\d{4}$/.test(password)) {
-    alert("비밀번호는 숫자 4자리로 입력해주세요.");
-    return;
-  }
-
-  try {
-    showLoading("평점 등록하는 중...");
-
-    const response = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "addRating",
-        restaurantId: normalizeId(restaurantId),
-        rating: Number(rating),
-        memo,
-        createdBy,
-        password,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (!result.success) {
-      alert(`평점 등록 실패: ${result.message || "알 수 없는 오류"}`);
-      return;
-    }
-
-    await loadData();
-    alert("평점 등록 완료!");
-  } catch (error) {
-    console.error("평점 등록 실패:", error);
-    alert("평점 등록 중 오류가 발생했어요.");
-  } finally {
-    hideLoading();
-  }
+function handleRateRestaurant(restaurantId, rating) {
+  openRatingModalForCreate(restaurantId, rating);
 }
 
-async function handleEditRating(review) {
+// 평점 수정
+function handleEditRating(review) {
   if (!review || !review.id) {
     alert("수정할 후기를 찾을 수 없어요.");
     return;
   }
 
-  const passwordInput = prompt("수정용 비밀번호 4자리를 입력해주세요.");
+  openRatingModalForEdit(review);
+}
+
+// 평점 삭제
+async function handleDeleteRating(review) {
+  if (!review || !review.id) {
+    alert("삭제할 후기를 찾을 수 없어요.");
+    return;
+  }
+
+  const passwordInput = prompt("삭제용 비밀번호 4자리를 입력해주세요.");
   if (passwordInput === null) {
     return;
   }
@@ -680,41 +785,19 @@ async function handleEditRating(review) {
     return;
   }
 
-  const ratingInput = prompt(
-    "새 평점을 입력해주세요. (1~5)",
-    String(Number(review.rating) || 0),
-  );
-  if (ratingInput === null) {
+  const confirmed = confirm("정말 이 후기를 삭제할까요?");
+  if (!confirmed) {
     return;
   }
-
-  const newRating = Number(ratingInput);
-
-  if (!Number.isInteger(newRating) || newRating < 1 || newRating > 5) {
-    alert("평점은 1부터 5 사이 숫자로 입력해주세요.");
-    return;
-  }
-
-  const memoInput = prompt(
-    "한줄 후기를 수정해주세요.",
-    String(review.memo || ""),
-  );
-  if (memoInput === null) {
-    return;
-  }
-
-  const memo = memoInput.trim();
 
   try {
-    showLoading("평점 수정하는 중...");
+    showLoading("평점 삭제하는 중...");
 
     const response = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
-        action: "updateRating",
+        action: "deleteRating",
         id: normalizeId(review.id),
-        rating: newRating,
-        memo,
         password,
       }),
     });
@@ -722,15 +805,15 @@ async function handleEditRating(review) {
     const result = await response.json();
 
     if (!result.success) {
-      alert(`평점 수정 실패: ${result.message || "알 수 없는 오류"}`);
+      alert(`평점 삭제 실패: ${result.message || "알 수 없는 오류"}`);
       return;
     }
 
     await loadData();
-    alert("평점 수정 완료!");
+    alert("평점 삭제 완료!");
   } catch (error) {
-    console.error("평점 수정 실패:", error);
-    alert("평점 수정 중 오류가 발생했어요.");
+    console.error("평점 삭제 실패:", error);
+    alert("평점 삭제 중 오류가 발생했어요.");
   } finally {
     hideLoading();
   }
