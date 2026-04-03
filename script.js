@@ -531,7 +531,7 @@ function renderRestaurants(data) {
     if (restaurant.naverURL) {
       mapLink.href = restaurant.naverURL;
       mapLink.style.display = "";
-      mapLink.textContent = "📍";
+      mapLink.textContent = "🚩";
       mapLink.setAttribute("target", "_blank");
       mapLink.setAttribute("rel", "noopener noreferrer");
       mapLink.classList.add("map-link-inline");
