@@ -1,5 +1,6 @@
 const loadingOverlay = document.getElementById("loadingOverlay");
-const API_URL = "https://script.google.com/macros/s/AKfycbyap-ZOHGgE04uPZMdzN9nxQE1f82WgS0m6EF6YnbfucKvcrY_4VHHJK2weIHKphUnd/exec";
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbx9OkbjIjkX5Ckqst_STTTIkR6OBJ9QG3QlwotQt4ilHixGCf7i8wHqsOS55ePzegB8/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
@@ -33,7 +34,9 @@ const activeFilterText = document.getElementById("activeFilterText");
 
 const restaurantList = document.getElementById("restaurantList");
 const emptyState = document.getElementById("emptyState");
-const restaurantCardTemplate = document.getElementById("restaurantCardTemplate");
+const restaurantCardTemplate = document.getElementById(
+  "restaurantCardTemplate",
+);
 
 const CACHE_KEY = "lunch_restaurant_cache_v1";
 
@@ -61,12 +64,14 @@ async function loadDataSilently() {
   try {
     const response = await fetch(`${API_URL}?action=getAllData`, {
       method: "GET",
-      cache: "no-store"
+      cache: "no-store",
     });
 
     const result = await response.json();
 
-    const restaurants = Array.isArray(result.restaurants) ? result.restaurants : [];
+    const restaurants = Array.isArray(result.restaurants)
+      ? result.restaurants
+      : [];
     const ratings = Array.isArray(result.ratings) ? result.ratings : [];
 
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
@@ -87,8 +92,8 @@ function saveRestaurantCache(data) {
       CACHE_KEY,
       JSON.stringify({
         savedAt: Date.now(),
-        data
-      })
+        data,
+      }),
     );
   } catch (error) {
     console.warn("캐시 저장 실패:", error);
@@ -159,12 +164,14 @@ async function loadData() {
 
     const response = await fetch(`${API_URL}?action=getAllData`, {
       method: "GET",
-      cache: "no-store"
+      cache: "no-store",
     });
 
     const result = await response.json();
 
-    const restaurants = Array.isArray(result.restaurants) ? result.restaurants : [];
+    const restaurants = Array.isArray(result.restaurants)
+      ? result.restaurants
+      : [];
     const ratings = Array.isArray(result.ratings) ? result.ratings : [];
 
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
@@ -218,7 +225,7 @@ function mergeRestaurantAndRatings(restaurants, ratings) {
       tagArray: parseTags(restaurant.tags),
       ratings: relatedRatings,
       ratingCount: validScores.length,
-      avgRating
+      avgRating,
     };
   });
 }
@@ -235,7 +242,9 @@ function parseTags(tags) {
 // 카테고리 필터 채우기
 function populateCategoryFilter(data) {
   const currentValue = categoryFilter.value;
-  const categories = [...new Set(data.map((item) => item.category).filter(Boolean))];
+  const categories = [
+    ...new Set(data.map((item) => item.category).filter(Boolean)),
+  ];
 
   categoryFilter.innerHTML = `<option value="all">전체</option>`;
 
@@ -246,7 +255,9 @@ function populateCategoryFilter(data) {
     categoryFilter.appendChild(option);
   });
 
-  if ([...categoryFilter.options].some((option) => option.value === currentValue)) {
+  if (
+    [...categoryFilter.options].some((option) => option.value === currentValue)
+  ) {
     categoryFilter.value = currentValue;
   }
 }
@@ -379,7 +390,9 @@ function renderRestaurants(data) {
 
     cardTitle.textContent = restaurant.name || "-";
     cardCategory.textContent = restaurant.category || "카테고리 없음";
-    cardPrice.textContent = restaurant.price ? `₩ ${formatNumber(restaurant.price)}` : "가격 정보 없음";
+    cardPrice.textContent = restaurant.price
+      ? `₩ ${formatNumber(restaurant.price)}`
+      : "가격 정보 없음";
     cardComment.textContent = restaurant.comment || "설명 없음";
     cardCreatedBy.textContent = `등록자: ${restaurant.createdBy || "익명"}`;
 
@@ -409,7 +422,9 @@ function renderRestaurants(data) {
       button.type = "button";
       button.className = "star-rate-btn";
       button.textContent = `${i}★`;
-      button.addEventListener("click", () => handleRateRestaurant(restaurant.id, i));
+      button.addEventListener("click", () =>
+        handleRateRestaurant(restaurant.id, i),
+      );
       ratingButtons.appendChild(button);
     }
 
@@ -438,12 +453,27 @@ function renderRestaurants(data) {
           const memo = escapeHtml(review.memo || "");
           const score = Number(review.rating) || 0;
           const date = formatDate(review.createdAt);
+          const canEdit = review.password;
 
           item.innerHTML = `
             <p class="review-stars">${"★".repeat(score)}${"☆".repeat(5 - score)}</p>
             <p class="review-memo">${memo || "한줄 후기는 없음"}</p>
-            <p class="review-meta">${writer} · ${date}</p>
+            <div class="review-bottom">
+              <p class="review-meta">${writer} · ${date}</p>
+              ${
+                canEdit
+                  ? `<button type="button" class="review-edit-btn">수정</button>`
+                  : ""
+              }
+            </div>
           `;
+
+          if (canEdit) {
+            const editButton = item.querySelector(".review-edit-btn");
+            editButton.addEventListener("click", () =>
+              handleEditRating(review),
+            );
+          }
 
           reviewList.appendChild(item);
         });
@@ -498,7 +528,8 @@ function handleRandomPick() {
     return;
   }
 
-  const picked = filteredRestaurants[Math.floor(Math.random() * filteredRestaurants.length)];
+  const picked =
+    filteredRestaurants[Math.floor(Math.random() * filteredRestaurants.length)];
 
   randomName.textContent = picked.name || "이름 없음";
   randomMeta.textContent = `${picked.category || "카테고리 없음"} · ₩ ${formatNumber(picked.price)} · 평점 ${picked.avgRating.toFixed(1)} (${picked.ratingCount}명)`;
@@ -558,8 +589,8 @@ async function handleAddRestaurant(event) {
         comment,
         tags,
         naverMapUrl,
-        createdBy: createdBy || "익명"
-      })
+        createdBy: createdBy || "익명",
+      }),
     });
 
     const result = await response.json();
@@ -583,8 +614,21 @@ async function handleAddRestaurant(event) {
 // 평점 등록
 async function handleRateRestaurant(restaurantId, rating) {
   const createdBy = prompt("이름을 입력해주세요! (취소하면 익명)") || "익명";
-  const memoInput = prompt("한줄 후기를 남겨주실래? (취소하면 빈칸)");
+  const memoInput = prompt("한줄 후기를 남겨주실래요? (취소하면 빈칸)");
   const memo = memoInput === null ? "" : memoInput.trim();
+
+  const passwordInput = prompt("수정/삭제용 비밀번호 4자리를 입력해주세요.");
+  if (passwordInput === null) {
+    alert("평점 등록이 취소됐어요.");
+    return;
+  }
+
+  const password = passwordInput.trim();
+
+  if (!/^\d{4}$/.test(password)) {
+    alert("비밀번호는 숫자 4자리로 입력해주세요.");
+    return;
+  }
 
   try {
     showLoading("평점 등록하는 중...");
@@ -596,8 +640,9 @@ async function handleRateRestaurant(restaurantId, rating) {
         restaurantId: normalizeId(restaurantId),
         rating: Number(rating),
         memo,
-        createdBy
-      })
+        createdBy,
+        password,
+      }),
     });
 
     const result = await response.json();
@@ -612,6 +657,80 @@ async function handleRateRestaurant(restaurantId, rating) {
   } catch (error) {
     console.error("평점 등록 실패:", error);
     alert("평점 등록 중 오류가 발생했어요.");
+  } finally {
+    hideLoading();
+  }
+}
+
+async function handleEditRating(review) {
+  if (!review || !review.id) {
+    alert("수정할 후기를 찾을 수 없어요.");
+    return;
+  }
+
+  const passwordInput = prompt("수정용 비밀번호 4자리를 입력해주세요.");
+  if (passwordInput === null) {
+    return;
+  }
+
+  const password = passwordInput.trim();
+
+  if (!/^\d{4}$/.test(password)) {
+    alert("비밀번호는 숫자 4자리로 입력해주세요.");
+    return;
+  }
+
+  const ratingInput = prompt(
+    "새 평점을 입력해주세요. (1~5)",
+    String(Number(review.rating) || 0),
+  );
+  if (ratingInput === null) {
+    return;
+  }
+
+  const newRating = Number(ratingInput);
+
+  if (!Number.isInteger(newRating) || newRating < 1 || newRating > 5) {
+    alert("평점은 1부터 5 사이 숫자로 입력해주세요.");
+    return;
+  }
+
+  const memoInput = prompt(
+    "한줄 후기를 수정해주세요.",
+    String(review.memo || ""),
+  );
+  if (memoInput === null) {
+    return;
+  }
+
+  const memo = memoInput.trim();
+
+  try {
+    showLoading("평점 수정하는 중...");
+
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "updateRating",
+        id: normalizeId(review.id),
+        rating: newRating,
+        memo,
+        password,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      alert(`평점 수정 실패: ${result.message || "알 수 없는 오류"}`);
+      return;
+    }
+
+    await loadData();
+    alert("평점 수정 완료!");
+  } catch (error) {
+    console.error("평점 수정 실패:", error);
+    alert("평점 수정 중 오류가 발생했어요.");
   } finally {
     hideLoading();
   }
