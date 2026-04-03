@@ -1021,3 +1021,79 @@ a {
   background: #dbeafe;
   transform: scale(1.05);
 }
+
+.star {
+  position: relative;
+  display: inline-block;
+  font-size: 14px;
+  color: #e5e7eb; /* 기본 회색 */
+}
+
+.star.full {
+  color: #f59e0b;
+}
+
+.star.empty {
+  color: #e5e7eb;
+}
+
+.star.half {
+  color: #e5e7eb;
+}
+
+.star.half::before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  overflow: hidden;
+  color: #f59e0b;
+}
+.rating-slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#ratingSlider {
+  width: 100%;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.rating-slider-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+#ratingSelectedText {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.rating-star-preview {
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: #f59e0b;
+}
+.rating-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.star-rate-icon-btn {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.star-rate-icon-btn .star-rate-icon {
+  font-size: 24px;
+  color: #f59e0b;
+}

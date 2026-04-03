@@ -46,9 +46,12 @@ const ratingModalState = {
   reviewId: null,
 };
 
+let selectedRatingValue = 5;
+
 // 시작
 document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
+  initRatingSlider();
   initRatingModal();
   const cachedData = loadRestaurantCache();
 
@@ -76,7 +79,7 @@ function openRatingModalForCreate(restaurantId, rating = 5) {
 
   document.getElementById("ratingCreatedBy").value = "";
   document.getElementById("ratingCreatedBy").disabled = false;
-  document.getElementById("ratingScore").value = String(rating);
+  updateRatingSliderUI(Number(rating) || 5);
   document.getElementById("ratingMemo").value = "";
   document.getElementById("ratingPassword").value = "";
   document.getElementById("ratingModalError").textContent = "";
@@ -94,9 +97,7 @@ function openRatingModalForEdit(review) {
 
   document.getElementById("ratingCreatedBy").value = review.createdBy || "익명";
   document.getElementById("ratingCreatedBy").disabled = true;
-  document.getElementById("ratingScore").value = String(
-    Number(review.rating) || 5,
-  );
+  updateRatingSliderUI(Number(review.rating) || 5);
   document.getElementById("ratingMemo").value = review.memo || "";
   document.getElementById("ratingPassword").value = "";
   document.getElementById("ratingModalError").textContent = "";
@@ -119,8 +120,8 @@ async function handleRatingModalSubmit() {
 
   errorEl.textContent = "";
 
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    errorEl.textContent = "평점은 1~5 사이로 선택해주세요.";
+  if (isNaN(rating) || rating < 0.5 || rating > 5) {
+    errorEl.textContent = "평점은 0.5~5 사이로 선택해주세요.";
     return;
   }
 
@@ -549,7 +550,7 @@ function renderRestaurants(data) {
     cardComment.textContent = restaurant.comment || "설명 없음";
     cardCreatedBy.textContent = `등록자: ${restaurant.createdBy || "익명"}`;
 
-    staticStars.textContent = makeStars(restaurant.avgRating);
+    staticStars.innerHTML = makeStars(restaurant.avgRating);
     ratingScore.textContent = `${restaurant.avgRating.toFixed(1)} / 5 (${restaurant.ratingCount}명)`;
 
     // 태그
@@ -570,14 +571,18 @@ function renderRestaurants(data) {
 
     // 평점 버튼
     ratingButtons.innerHTML = "";
+
     for (let i = 1; i <= 5; i++) {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "star-rate-btn";
-      button.textContent = `${i}★`;
-      button.addEventListener("click", () =>
-        handleRateRestaurant(restaurant.id, i),
-      );
+      button.className = "star-rate-btn star-rate-icon-btn";
+      button.innerHTML = `<span class="star-rate-icon">☆</span>`;
+      button.setAttribute("aria-label", `${i}점으로 평점 남기기`);
+
+      button.addEventListener("click", () => {
+        openRatingModalForCreate(restaurant.id, i);
+      });
+
       ratingButtons.appendChild(button);
     }
 
@@ -610,7 +615,7 @@ function renderRestaurants(data) {
 
           item.innerHTML = `
   <div class="review-top">
-    <p class="review-stars">${"★".repeat(score)}${"☆".repeat(5 - score)}</p>
+    <div class="review-stars">${makeStars(score)}</div>
 
     ${
       canEdit
@@ -775,6 +780,17 @@ function handleRateRestaurant(restaurantId, rating) {
   openRatingModalForCreate(restaurantId, rating);
 }
 
+function initRatingSlider() {
+  const slider = document.getElementById("ratingSlider");
+  if (!slider) return;
+
+  slider.addEventListener("input", (event) => {
+    updateRatingSliderUI(event.target.value);
+  });
+
+  updateRatingSliderUI(5);
+}
+
 // 평점 수정
 function handleEditRating(review) {
   if (!review || !review.id) {
@@ -839,15 +855,35 @@ async function handleDeleteRating(review) {
 }
 
 // 별 문자열
-function makeStars(avgRating) {
-  const rounded = Math.round(avgRating);
-  let stars = "";
+function makeStars(avg) {
+  let html = "";
 
   for (let i = 1; i <= 5; i++) {
-    stars += i <= rounded ? "★" : "☆";
+    if (avg >= i) {
+      html += `<span class="star full">★</span>`;
+    } else if (avg >= i - 0.5) {
+      html += `<span class="star half">★</span>`;
+    } else {
+      html += `<span class="star empty">★</span>`;
+    }
   }
 
-  return stars;
+  return html;
+}
+
+function updateRatingSliderUI(value) {
+  const slider = document.getElementById("ratingSlider");
+  const hiddenInput = document.getElementById("ratingScore");
+  const selectedText = document.getElementById("ratingSelectedText");
+  const starPreview = document.getElementById("ratingStarPreview");
+
+  const ratingValue = Number(value) || 5;
+
+  selectedRatingValue = ratingValue;
+  slider.value = String(ratingValue);
+  hiddenInput.value = String(ratingValue);
+  selectedText.textContent = `${ratingValue.toFixed(1)}점`;
+  starPreview.innerHTML = makeStars(ratingValue);
 }
 
 // 숫자 포맷
