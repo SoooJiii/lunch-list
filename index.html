@@ -1,135 +1,202 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>종로 점심 맛집 리스트</title>
-  <link rel="stylesheet" href="style_v2.css" />
-</head>
-<body>
-  <div class="container">
-    <header class="hero">
-  <div>
-    <p class="eyebrow">Lunch Pick</p>
-    <h1>종로 점심 맛집 리스트</h1>
-    <p class="hero-desc">
-      맛집을 같이 등록하고, 평점과 후기를 남겨봐요 🍽️<br />
-      카테고리, 태그, 검색으로 골라보고 고민되면 <strong>오늘 뭐 먹지?</strong> 버튼으로 랜덤 추천!
-    </p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>종로 점심 맛집 리스트</title>
+    <link rel="stylesheet" href="style_v2.css?1" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Lunch Pick</p>
+          <h1>종로 점심 맛집 리스트</h1>
+          <p class="hero-desc">
+            맛집을 같이 등록하고, 평점과 후기를 남겨봐요 🍽️<br />
+            카테고리, 태그, 검색으로 골라보고 고민되면
+            <strong>오늘 뭐 먹지?</strong> 버튼으로 랜덤 추천!
+          </p>
 
-    <div class="hero-links">
-      <a
-        href="https://www.notion.so/7b2b4b9c5d74471f92c752cb8898f00f?v=bfe528cc08d94f528c90e858dbb7b0a2"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="notion-link-btn"
+          <div class="hero-links">
+            <a
+              href="https://www.notion.so/7b2b4b9c5d74471f92c752cb8898f00f?v=bfe528cc08d94f528c90e858dbb7b0a2"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="notion-link-btn"
+            >
+              먹캘린더 보러가기!
+            </a>
+          </div>
+        </div>
+
+        <button id="randomBtn" class="random-btn" type="button">
+          오늘 뭐 먹지?
+        </button>
+      </header>
+
+      <section
+        id="randomResult"
+        class="random-result hidden"
+        aria-live="polite"
       >
-        먹캘린더 보러가기!
-      </a>
-    </div>
-  </div>
-
-  <button id="randomBtn" class="random-btn" type="button">오늘 뭐 먹지?</button>
-</header>
-
-    <section id="randomResult" class="random-result hidden" aria-live="polite">
-      <div class="random-result__content">
-        <p class="random-result__label">오늘의 추천</p>
-        <h2 id="randomName">맛집 이름</h2>
-        <p id="randomMeta" class="random-meta"></p>
-        <p id="randomComment" class="random-comment"></p>
-      </div>
-      <a id="randomMapLink" class="map-link" href="#" target="_blank" rel="noopener noreferrer">네이버지도 보기</a>
-    </section>
-
-   <section class="panel add-panel">
-  <details class="add-accordion">
-    <summary class="add-accordion__summary">
-      <div class="section-title-wrap summary-title">
-        <div>
-          <h2>맛집 추가</h2>
-          <p>맛집을 직접 등록해주세요!</p>
+        <div class="random-result__content">
+          <p class="random-result__label">오늘의 추천</p>
+          <h2 id="randomName">맛집 이름</h2>
+          <p id="randomMeta" class="random-meta"></p>
+          <p id="randomComment" class="random-comment"></p>
         </div>
-        <span class="accordion-hint">눌러서 펼치기</span>
-      </div>
-    </summary>
+        <a
+          id="randomMapLink"
+          class="map-link"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          >네이버지도 보기</a
+        >
+      </section>
 
-    <div class="add-accordion__content">
-      <form id="addRestaurantForm" class="add-form">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="nameInput">가게 이름 *</label>
-            <input type="text" id="nameInput" placeholder="예: 부자돈까스" required />
-          </div>
+      <section class="panel add-panel">
+        <details class="add-accordion">
+          <summary class="add-accordion__summary">
+            <div class="section-title-wrap summary-title">
+              <div>
+                <h2>맛집 추가</h2>
+                <p>맛집을 직접 등록해주세요!</p>
+              </div>
+              <span class="accordion-hint">눌러서 펼치기</span>
+            </div>
+          </summary>
 
-          <div class="form-group">
-            <label for="categoryInput">카테고리</label>
-            <input type="text" id="categoryInput" placeholder="예: 한식, 중식, 카페" />
-          </div>
+          <div class="add-accordion__content">
+            <form id="addRestaurantForm" class="add-form">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="nameInput">가게 이름 *</label>
+                  <input
+                    type="text"
+                    id="nameInput"
+                    placeholder="예: 부자돈까스"
+                    required
+                  />
+                </div>
 
-          <div class="form-group">
-            <label for="priceInput">가격</label>
-            <input type="number" id="priceInput" placeholder="예: 10000" min="0" />
-          </div>
+                <div class="form-group">
+                  <label for="categoryInput">카테고리</label>
+                  <input
+                    type="text"
+                    id="categoryInput"
+                    placeholder="예: 한식, 중식, 카페"
+                  />
+                </div>
 
-          <div class="form-group">
-            <label for="createdByInput">등록자</label>
-            <input type="text" id="createdByInput" placeholder="예: 수지" />
-          </div>
+                <div class="form-group">
+                  <label for="priceInput">가격</label>
+                  <input
+                    type="number"
+                    id="priceInput"
+                    placeholder="예: 10000"
+                    min="0"
+                  />
+                </div>
 
-          <div class="form-group full-width">
-            <label for="commentInput">한줄 설명</label>
-            <input type="text" id="commentInput" placeholder="예: 만두가 맛있고 빨리 나옴" />
-          </div>
+                <div class="form-group">
+                  <label for="createdByInput">등록자</label>
+                  <input
+                    type="text"
+                    id="createdByInput"
+                    placeholder="예: 수지"
+                  />
+                </div>
 
-          <div class="form-group full-width">
-            <label for="tagsInput">태그</label>
-            <input type="text" id="tagsInput" placeholder="예: 혼밥,가성비,빠름" />
-          </div>
+                <div class="form-group full-width">
+                  <label for="commentInput">한줄 설명</label>
+                  <input
+                    type="text"
+                    id="commentInput"
+                    placeholder="예: 만두가 맛있고 빨리 나옴"
+                  />
+                </div>
 
-          <div class="form-group full-width">
-            <label for="mapUrlInput">네이버지도 링크</label>
-            <input type="url" id="mapUrlInput" placeholder="https://map.naver.com/..." />
+                <div class="form-group full-width">
+                  <label for="tagsInput">태그</label>
+                  <input
+                    type="text"
+                    id="tagsInput"
+                    placeholder="예: 혼밥,가성비,빠름"
+                  />
+                </div>
+
+                <div class="form-group full-width">
+                  <label for="mapUrlInput">네이버지도 링크</label>
+                  <input
+                    type="url"
+                    id="mapUrlInput"
+                    placeholder="https://map.naver.com/..."
+                  />
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="primary-btn">맛집 추가하기</button>
+              </div>
+            </form>
           </div>
+        </details>
+      </section>
+
+      <section class="panel filters-panel">
+        <details class="filter-accordion">
+          <summary class="filter-accordion__summary">
+            <div class="section-title-wrap summary-title">
+              <div>
+                <h2>필터</h2>
+                <p>조건에 맞는 맛집만 골라볼 수 있어요</p>
+              </div>
+              <span class="accordion-hint">눌러서 펼치기</span>
+            </div>
+          </summary>
+
+          <div class="filter-accordion__content">
+            <div class="filter-grid">
+              <div class="filter-group search-group">
+                <label for="searchInput">검색</label>
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="가게 이름이나 코멘트 검색"
+                />
+              </div>
+
+              <div class="filter-group">
+                <label for="categoryFilter">카테고리</label>
+                <select id="categoryFilter">
+                  <option value="all">전체</option>
+                </select>
+              </div>
+
+              <div class="filter-group full-width">
+                <div class="tag-header">
+                  <label>태그</label>
+                  <button id="resetFiltersBtn" class="reset-btn" type="button">
+                    필터 초기화
+                  </button>
+                </div>
+                <div id="tagFilters" class="tag-filters"></div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </section>
+      <section class="summary-bar">
+        <div class="summary-info">
+          <p id="resultCount">총 0곳</p>
+          <p id="activeFilterText">전체 맛집을 보여주는 중</p>
         </div>
 
-        <div class="form-actions">
-          <button type="submit" class="primary-btn">맛집 추가하기</button>
-        </div>
-      </form>
-    </div>
-  </details>
-</section>
-
-    <section class="panel filters-panel">
-  <details class="filter-accordion" >
-    <summary class="filter-accordion__summary">
-      <div class="section-title-wrap summary-title">
-        <div>
-          <h2>필터</h2>
-          <p>조건에 맞는 맛집만 골라볼 수 있어요</p>
-        </div>
-        <span class="accordion-hint">눌러서 펼치기</span>
-      </div>
-    </summary>
-
-    <div class="filter-accordion__content">
-      <div class="filter-grid">
-        <div class="filter-group search-group">
-          <label for="searchInput">검색</label>
-          <input type="text" id="searchInput" placeholder="가게 이름이나 코멘트 검색" />
-        </div>
-
-        <div class="filter-group">
-          <label for="categoryFilter">카테고리</label>
-          <select id="categoryFilter">
-            <option value="all">전체</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="sortFilter">정렬</label>
-          <select id="sortFilter">
+        <div class="summary-actions">
+          <label for="sortFilter" class="sort-label">정렬</label>
+          <select id="sortFilter" class="sort-select">
             <option value="default">기본순</option>
             <option value="priceAsc">가격 낮은순</option>
             <option value="priceDesc">가격 높은순</option>
@@ -138,78 +205,70 @@
             <option value="ratingCountDesc">평점 많은순</option>
           </select>
         </div>
+      </section>
 
-        <div class="filter-group full-width">
-          <div class="tag-header">
-            <label>태그</label>
-            <button id="resetFiltersBtn" class="reset-btn" type="button">필터 초기화</button>
-          </div>
-          <div id="tagFilters" class="tag-filters"></div>
+      <section>
+        <div id="restaurantList" class="restaurant-list"></div>
+
+        <div id="emptyState" class="empty-state hidden">
+          <p>조건에 맞는 맛집이 없습니다 😢</p>
+          <p>필터를 조금 풀어보거나 검색어를 바꿔보세요!</p>
         </div>
+      </section>
+    </div>
+
+    <template id="restaurantCardTemplate">
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title"></h3>
+            <p class="card-category"></p>
+          </div>
+          <p class="card-price"></p>
+        </div>
+
+        <p class="card-comment"></p>
+
+        <div class="card-rating-summary">
+          <span class="rating-stars static-stars"></span>
+          <span class="rating-score"></span>
+        </div>
+
+        <div class="card-tags"></div>
+
+        <div class="rating-section">
+          <div class="rating-section__top">
+            <strong>평점 남기기</strong>
+            <span class="rating-guide">클릭해서 1~5점 남기기</span>
+          </div>
+          <div class="rating-buttons"></div>
+        </div>
+
+        <details class="review-section">
+          <summary class="review-summary">후기 보기</summary>
+          <div class="review-list"></div>
+        </details>
+
+        <div class="card-footer">
+          <p class="card-created-by"></p>
+          <a class="map-link" target="_blank" rel="noopener noreferrer"
+            >네이버지도</a
+          >
+        </div>
+      </article>
+    </template>
+
+    <div
+      id="loadingOverlay"
+      class="loading-overlay hidden"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <p>맛집 리스트 불러오는 중...!</p>
       </div>
     </div>
-  </details>
-</section>
-    <section class="summary-bar">
-      <p id="resultCount">총 0곳</p>
-      <p id="activeFilterText">전체 맛집을 보여주는 중</p>
-    </section>
-
-    <section>
-      <div id="restaurantList" class="restaurant-list"></div>
-
-      <div id="emptyState" class="empty-state hidden">
-        <p>조건에 맞는 맛집이 없습니다 😢</p>
-        <p>필터를 조금 풀어보거나 검색어를 바꿔보세요!</p>
-      </div>
-    </section>
-  </div>
-
-  <template id="restaurantCardTemplate">
-    <article class="card">
-      <div class="card-header">
-        <div>
-          <h3 class="card-title"></h3>
-          <p class="card-category"></p>
-        </div>
-        <p class="card-price"></p>
-      </div>
-
-      <p class="card-comment"></p>
-
-      <div class="card-rating-summary">
-        <span class="rating-stars static-stars"></span>
-        <span class="rating-score"></span>
-      </div>
-
-      <div class="card-tags"></div>
-
-      <div class="rating-section">
-        <div class="rating-section__top">
-          <strong>평점 남기기</strong>
-          <span class="rating-guide">클릭해서 1~5점 남기기</span>
-        </div>
-        <div class="rating-buttons"></div>
-      </div>
-
-      <details class="review-section">
-        <summary class="review-summary">후기 보기</summary>
-        <div class="review-list"></div>
-      </details>
-
-      <div class="card-footer">
-        <p class="card-created-by"></p>
-        <a class="map-link" target="_blank" rel="noopener noreferrer">네이버지도</a>
-      </div>
-    </article>
-  </template>
-  
-<div id="loadingOverlay" class="loading-overlay hidden" aria-live="polite" aria-busy="true">
-  <div class="loading-box">
-    <div class="spinner"></div>
-    <p>맛집 리스트 불러오는 중...!</p>
-  </div>
-</div>
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
