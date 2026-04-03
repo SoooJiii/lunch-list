@@ -587,21 +587,30 @@ function renderRestaurants(data) {
           const memo = escapeHtml(review.memo || "");
           const score = Number(review.rating) || 0;
           const date = formatDate(review.createdAt);
-          const canEdit = review.password;
+          const canEdit = review.password && review.password !== "locked";
 
           item.innerHTML = `
-            <p class="review-stars">${"★".repeat(score)}${"☆".repeat(5 - score)}</p>
-            <p class="review-memo">${memo || "한줄 후기는 없음"}</p>
-            <div class="review-bottom">
-              <p class="review-meta">${writer} · ${date}</p>
-              ${
-                canEdit
-                  ? `<button type="button" class="review-edit-btn">수정</button>
-                      <button type="button" class="review-delete-btn">삭제</button>`
-                  : ""
-              }
-            </div>
-          `;
+  <div class="review-top">
+    <p class="review-stars">${"★".repeat(score)}${"☆".repeat(5 - score)}</p>
+
+    ${
+      canEdit
+        ? `
+        <div class="review-actions">
+          <button type="button" class="review-edit-btn">수정</button>
+          <button type="button" class="review-delete-btn">삭제</button>
+        </div>
+      `
+        : ""
+    }
+  </div>
+
+  <p class="review-memo">${memo || "한줄 후기는 없음"}</p>
+
+  <div class="review-bottom">
+    <p class="review-meta">${writer} · ${date}</p>
+  </div>
+`;
 
           if (canEdit) {
             const editButton = item.querySelector(".review-edit-btn");
