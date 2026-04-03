@@ -569,7 +569,7 @@ function renderRestaurants(data) {
     if (restaurant.ratings.length === 0) {
       const emptyReview = document.createElement("p");
       emptyReview.className = "review-empty";
-      emptyReview.textContent = "아직 후기가 없어.";
+      emptyReview.textContent = "아직 후기가 없어요.";
       reviewList.appendChild(emptyReview);
     } else {
       restaurant.ratings
