@@ -524,7 +524,7 @@ function updateSummary() {
 // 랜덤 추천
 function handleRandomPick() {
   if (!filteredRestaurants.length) {
-    alert("추천할 맛집이 없어 😢");
+    alert("추천할 맛집이 없어요 😢");
     return;
   }
 
@@ -571,7 +571,7 @@ async function handleAddRestaurant(event) {
   const naverMapUrl = mapUrlInput.value.trim();
 
   if (!name) {
-    alert("가게 이름은 꼭 입력해주세!");
+    alert("가게 이름은 꼭 입력해주세요!");
     nameInput.focus();
     return;
   }
