@@ -354,7 +354,7 @@ function mergeRestaurantAndRatings(restaurants, ratings) {
       price: Number(restaurant.price) || 0,
       comment: String(restaurant.comment || "").trim(),
       tags: String(restaurant.tags || "").trim(),
-      naverMapUrl: String(restaurant.naverMapUrl || "").trim(),
+      naverURL: String(restaurant.naverURL || "").trim(),
       createdBy: String(restaurant.createdBy || "익명").trim(),
       tagArray: parseTags(restaurant.tags),
       ratings: relatedRatings,
@@ -522,7 +522,26 @@ function renderRestaurants(data) {
     const cardCreatedBy = fragment.querySelector(".card-created-by");
     const mapLink = fragment.querySelector(".map-link");
 
-    cardTitle.textContent = restaurant.name || "-";
+    cardTitle.innerHTML = "";
+
+    const titleText = document.createElement("span");
+    titleText.textContent = restaurant.name || "-";
+    cardTitle.appendChild(titleText);
+
+    if (restaurant.naverURL) {
+      mapLink.href = restaurant.naverURL;
+      mapLink.style.display = "";
+      mapLink.textContent = "📍";
+      mapLink.setAttribute("target", "_blank");
+      mapLink.setAttribute("rel", "noopener noreferrer");
+      mapLink.classList.add("map-link-inline");
+
+      cardTitle.appendChild(mapLink);
+    } else {
+      mapLink.removeAttribute("href");
+      mapLink.style.display = "none";
+    }
+
     cardCategory.textContent = restaurant.category || "카테고리 없음";
     cardPrice.textContent = restaurant.price
       ? `₩ ${formatNumber(restaurant.price)}`
@@ -628,15 +647,6 @@ function renderRestaurants(data) {
         });
     }
 
-    // 지도 링크
-    if (restaurant.naverMapUrl) {
-      mapLink.href = restaurant.naverMapUrl;
-      mapLink.style.display = "";
-    } else {
-      mapLink.removeAttribute("href");
-      mapLink.style.display = "none";
-    }
-
     restaurantList.appendChild(fragment);
   });
 }
@@ -684,8 +694,8 @@ function handleRandomPick() {
   randomMeta.textContent = `${picked.category || "카테고리 없음"} · ₩ ${formatNumber(picked.price)} · 평점 ${picked.avgRating.toFixed(1)} (${picked.ratingCount}명)`;
   randomComment.textContent = picked.comment || "설명 없음";
 
-  if (picked.naverMapUrl) {
-    randomMapLink.href = picked.naverMapUrl;
+  if (picked.naverURL) {
+    randomMapLink.href = picked.naverURL;
     randomMapLink.style.display = "";
   } else {
     randomMapLink.removeAttribute("href");
@@ -717,7 +727,7 @@ async function handleAddRestaurant(event) {
   const createdBy = createdByInput.value.trim();
   const comment = commentInput.value.trim();
   const tags = tagsInput.value.trim();
-  const naverMapUrl = mapUrlInput.value.trim();
+  const naverURL = mapUrlInput.value.trim();
 
   if (!name) {
     alert("가게 이름은 꼭 입력해주세요!");
@@ -737,7 +747,7 @@ async function handleAddRestaurant(event) {
         price,
         comment,
         tags,
-        naverMapUrl,
+        naverURL,
         createdBy: createdBy || "익명",
       }),
     });

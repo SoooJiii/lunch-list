@@ -421,24 +421,6 @@ a {
   margin-top: 6px;
 }
 
-.map-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 120px;
-  padding: 10px 14px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.map-link:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
 /* forms */
 .add-form,
 .filter-grid {
@@ -1009,4 +991,33 @@ a {
 .btn-secondary {
   flex: 1;
   justify-content: center;
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.map-link-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+  background: #f3f4f6;
+  color: #2563eb;
+  flex: none;
+  box-sizing: border-box;
+}
+
+.map-link-inline:hover {
+  background: #dbeafe;
+  transform: scale(1.05);
 }
