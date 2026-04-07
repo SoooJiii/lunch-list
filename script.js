@@ -584,6 +584,19 @@ function renderRestaurants(data) {
     staticStars.innerHTML = makeStars(restaurant.avgRating);
     ratingScore.textContent = `${restaurant.avgRating.toFixed(1)} / 5 (${restaurant.ratingCount}명)`;
 
+    const cardFooter = fragment.querySelector(".card-footer");
+
+    const shareButton = document.createElement("button");
+    shareButton.type = "button";
+    shareButton.className = "share-btn";
+    shareButton.textContent = "🔗 추천하기";
+
+    shareButton.addEventListener("click", () => {
+      copyLink(restaurant.id);
+    });
+
+    cardFooter.appendChild(shareButton);
+
     // 태그
     cardTags.innerHTML = "";
     if (restaurant.tagArray.length > 0) {
@@ -687,6 +700,36 @@ function renderRestaurants(data) {
   });
 
   applyDeepLink();
+}
+
+// 링크 복사 함수 추카
+function copyLink(idx) {
+  const url = `${location.origin}${location.pathname}?idx=${idx}`;
+
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      showToast("링크 복사됨 👍");
+    })
+    .catch(() => {
+      alert("복사 실패 😢");
+    });
+}
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("show");
+  }, 10);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 2000);
 }
 
 // 카드 링크 함수 추가
