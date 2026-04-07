@@ -1097,3 +1097,8 @@ a {
   font-size: 24px;
   color: #f59e0b;
 }
+
+.highlight {
+  border: 2px solid #ff9800;
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
+}

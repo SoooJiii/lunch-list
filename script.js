@@ -55,6 +55,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   initRatingModal();
   const cachedData = loadRestaurantCache();
 
+  const params = new URLSearchParams(window.location.search);
+  const idx = params.get("idx");
+
+  if (idx) {
+    focusCard(idx);
+  }
+
   if (cachedData && cachedData.length > 0) {
     allRestaurants = cachedData;
     populateCategoryFilter(allRestaurants);
@@ -68,6 +75,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadData();
   }
 });
+
+function focusCard(idx) {
+  const el = document.querySelector(`[data-idx="${idx}"]`);
+
+  if (!el) return;
+
+  // 부드럽게 가운데로 이동
+  el.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+
+  // 강조 효과
+  el.classList.add("highlight");
+
+  // (선택) 3초 후 강조 제거
+  setTimeout(() => {
+    el.classList.remove("highlight");
+  }, 3000);
+}
 
 function openRatingModalForCreate(restaurantId, rating = 5) {
   ratingModalState.mode = "create";
@@ -265,6 +292,7 @@ function hideLoading() {
   if (!loadingOverlay) return;
   loadingOverlay.classList.add("hidden");
 }
+
 // 이벤트 연결
 function bindEvents() {
   if (randomBtn) {
@@ -510,6 +538,9 @@ function renderRestaurants(data) {
   data.forEach((restaurant) => {
     const fragment = restaurantCardTemplate.content.cloneNode(true);
 
+    const cardRoot = fragment.querySelector(".card");
+    cardRoot.setAttribute("data-idx", restaurant.id);
+
     const cardTitle = fragment.querySelector(".card-title");
     const cardCategory = fragment.querySelector(".card-category");
     const cardPrice = fragment.querySelector(".card-price");
@@ -654,6 +685,51 @@ function renderRestaurants(data) {
 
     restaurantList.appendChild(fragment);
   });
+
+  applyDeepLink();
+}
+
+// 카드 링크 함수 추가
+function applyDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const idx = params.get("idx");
+
+  if (!idx) return;
+
+  const el = document.querySelector(`[data-idx="${idx}"]`);
+  if (!el) return;
+
+  // ⭐ 맨 위로 올리기 (부드럽게)
+  if (el.parentNode === restaurantList) {
+    restaurantList.prepend(el);
+  }
+
+  // 스크롤 (사실 위로 올렸으면 거의 필요 없지만 안정성용)
+  el.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+
+  // 강조
+  el.classList.add("highlight");
+
+  // 애니메이션
+  el.animate(
+    [
+      { transform: "scale(1)" },
+      { transform: "scale(1.05)" },
+      { transform: "scale(1)" },
+    ],
+    {
+      duration: 600,
+      easing: "ease-in-out",
+    },
+  );
+
+  // 3초 후 강조 제거
+  setTimeout(() => {
+    el.classList.remove("highlight");
+  }, 1000);
 }
 
 // 요약 바 업데이트
