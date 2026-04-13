@@ -1,6 +1,6 @@
 const loadingOverlay = document.getElementById("loadingOverlay");
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbzZFkYz0eW31RL7eEp6VGLrYv74g9W4Nbb5RP2XnN70CYQ-gUzzpVn_gBlYvLxeRA3o/exec";
+  "https://script.google.com/macros/s/AKfycbzK8PoGoPtA7iFQsud1uiqbUvSZy6r43eiZ22PCdNKFHO0UxgdgxLp1N0Srk7TtmMeS/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
