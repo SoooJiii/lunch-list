@@ -1,10 +1,13 @@
 const loadingOverlay = document.getElementById("loadingOverlay");
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbzK8PoGoPtA7iFQsud1uiqbUvSZy6r43eiZ22PCdNKFHO0UxgdgxLp1N0Srk7TtmMeS/exec";
+  "https://script.google.com/macros/s/AKfycbxj9NnMj_pfg0MkVi0AwWkUKLK3OhBOCLD7Cbf0Bh7DnQNPM1GlCImYkZeNHcoQ7nQz/exec";
 
 let allRestaurants = [];
 let filteredRestaurants = [];
 let selectedTags = new Set();
+let areaCounts = {};
+
+let deepLinkHandled = false;
 
 // DOM
 const randomBtn = document.getElementById("randomBtn");
@@ -47,6 +50,8 @@ const ratingModalState = {
 };
 
 let selectedRatingValue = 5;
+
+const areaInput = document.getElementById("areaInput");
 
 // 시작
 document.addEventListener("DOMContentLoaded", async () => {
@@ -236,12 +241,16 @@ async function loadDataSilently() {
       : [];
     const ratings = Array.isArray(result.ratings) ? result.ratings : [];
 
+    areaCounts = result.areaCounts || {};
+
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
 
     saveRestaurantCache(allRestaurants);
 
     populateCategoryFilter(allRestaurants);
     renderTagFilters(allRestaurants);
+
+    renderAreaFilters(areaCounts);
     applyFilters();
   } catch (error) {
     console.error("조용한 데이터 갱신 실패:", error);
@@ -300,15 +309,24 @@ function bindEvents() {
   }
 
   if (searchInput) {
-    searchInput.addEventListener("input", applyFilters);
+    searchInput.addEventListener("input", () => {
+      resetAreaFilter();
+      applyFilters();
+    });
   }
 
   if (categoryFilter) {
-    categoryFilter.addEventListener("change", applyFilters);
+    categoryFilter.addEventListener("change", () => {
+      resetAreaFilter();
+      applyFilters();
+    });
   }
 
   if (sortFilter) {
-    sortFilter.addEventListener("change", applyFilters);
+    sortFilter.addEventListener("change", () => {
+      resetAreaFilter();
+      applyFilters();
+    });
   }
 
   if (resetFiltersBtn) {
@@ -337,11 +355,14 @@ async function loadData() {
       : [];
     const ratings = Array.isArray(result.ratings) ? result.ratings : [];
 
+    areaCounts = result.areaCounts || {};
     allRestaurants = mergeRestaurantAndRatings(restaurants, ratings);
     saveRestaurantCache(allRestaurants);
 
     populateCategoryFilter(allRestaurants);
     renderTagFilters(allRestaurants);
+
+    renderAreaFilters(areaCounts);
     applyFilters();
   } catch (error) {
     console.error("데이터 로드 실패:", error);
@@ -447,7 +468,7 @@ function renderTagFilters(data) {
       } else {
         selectedTags.add(tag);
       }
-
+      resetAreaFilter();
       renderTagFilters(allRestaurants);
       applyFilters();
     });
@@ -463,6 +484,10 @@ function applyFilters() {
   const sortValue = sortFilter.value;
 
   let result = [...allRestaurants];
+
+  if (selectedArea !== "all") {
+    result = result.filter((item) => item.area === selectedArea);
+  }
 
   // 검색
   if (searchKeyword) {
@@ -573,11 +598,14 @@ function renderRestaurants(data) {
       mapLink.removeAttribute("href");
       mapLink.style.display = "none";
     }
+    const category = restaurant.category || "카테고리 없음";
+    const area = restaurant.area || "";
 
-    cardCategory.textContent = restaurant.category || "카테고리 없음";
+    cardCategory.textContent = area ? `${category} · ${area}` : category;
     cardPrice.textContent = restaurant.price
       ? `₩ ${formatNumber(restaurant.price)}`
       : "가격 정보 없음";
+
     cardComment.textContent = restaurant.comment || "설명 없음";
     cardCreatedBy.textContent = `등록자: ${restaurant.createdBy || "익명"}`;
 
@@ -734,6 +762,7 @@ function showToast(message) {
 
 // 카드 링크 함수 추가
 function applyDeepLink() {
+  if (deepLinkHandled) return;
   const params = new URLSearchParams(window.location.search);
   const idx = params.get("idx");
 
@@ -741,11 +770,6 @@ function applyDeepLink() {
 
   const el = document.querySelector(`[data-idx="${idx}"]`);
   if (!el) return;
-
-  // ⭐ 맨 위로 올리기 (부드럽게)
-  if (el.parentNode === restaurantList) {
-    restaurantList.prepend(el);
-  }
 
   // 스크롤 (사실 위로 올렸으면 거의 필요 없지만 안정성용)
   el.scrollIntoView({
@@ -772,7 +796,9 @@ function applyDeepLink() {
   // 3초 후 강조 제거
   setTimeout(() => {
     el.classList.remove("highlight");
-  }, 1000);
+  }, 3000);
+
+  deepLinkHandled = true;
 }
 
 // 요약 바 업데이트
@@ -836,6 +862,7 @@ function resetFilters() {
   categoryFilter.value = "all";
   sortFilter.value = "default";
   selectedTags.clear();
+  areaInput.value = "";
 
   renderTagFilters(allRestaurants);
   applyFilters();
@@ -850,6 +877,7 @@ async function handleAddRestaurant(event) {
   const price = priceInput.value.trim();
   const createdBy = createdByInput.value.trim();
   const comment = commentInput.value.trim();
+  const area = areaInput.value.trim();
   const tags = tagsInput.value.trim();
   const naverURL = mapUrlInput.value.trim();
 
@@ -872,6 +900,7 @@ async function handleAddRestaurant(event) {
         comment,
         tags,
         naverURL,
+        area,
         createdBy: createdBy || "익명",
       }),
     });
@@ -1035,4 +1064,57 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+// 위치 추가
+function renderAreaFilters(areaCounts) {
+  const container = document.getElementById("areaFilters");
+  container.innerHTML = "";
+
+  // 전체 버튼
+  const total = Object.values(areaCounts).reduce((a, b) => a + b, 0);
+
+  const allBtn = document.createElement("button");
+  allBtn.className = "area-chip active";
+  allBtn.dataset.area = "all";
+  allBtn.textContent = `전체 (${total})`;
+
+  container.appendChild(allBtn);
+
+  // 지역 버튼들
+  Object.entries(areaCounts).forEach(([area, count]) => {
+    const btn = document.createElement("button");
+    btn.className = "area-chip";
+    btn.dataset.area = area;
+    btn.textContent = `${area} (${count})`;
+
+    container.appendChild(btn);
+  });
+}
+let selectedArea = "all";
+
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("area-chip")) {
+    selectedArea = e.target.dataset.area;
+
+    // active 처리
+    document
+      .querySelectorAll(".area-chip")
+      .forEach((btn) => btn.classList.remove("active"));
+    e.target.classList.add("active");
+
+    applyFilters();
+  }
+});
+
+function resetAreaFilter() {
+  selectedArea = "all";
+
+  document.querySelectorAll(".area-chip").forEach((btn) => {
+    btn.classList.remove("active");
+
+    if (btn.dataset.area === "all") {
+      btn.classList.add("active");
+    }
+  });
 }

@@ -340,15 +340,21 @@ a {
 
 .filter-accordion__summary,
 .add-accordion__summary {
-  list-style: none;
-  cursor: pointer;
+  gap: 12px;
+  align-items: center;
 }
 
 .filter-accordion__summary::-webkit-details-marker,
 .add-accordion__summary::-webkit-details-marker {
   display: none;
 }
+summary {
+  list-style: none;
+}
 
+summary::-webkit-details-marker {
+  display: none;
+}
 .filter-accordion__content,
 .add-accordion__content {
   margin-top: 18px;
@@ -373,7 +379,16 @@ a {
   padding: 8px 12px;
   border-radius: 999px;
 }
-
+.summary-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  font-size: 13px;
+  color: #6b7280;
+}
+.add-accordion:not([open]) .add-accordion__summary {
+  grid-template-columns: 1fr 1fr;
+}
 .filter-accordion[open] .accordion-hint,
 .add-accordion[open] .accordion-hint {
   background: #e5e7eb;
@@ -1146,4 +1161,72 @@ a {
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+.area-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.area-chip {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.area-chip:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.area-chip.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+.area-select {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.form-group input,
+.form-group select {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+}
+.top-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .top-panels {
+    grid-template-columns: 1fr;
+  }
+}
+.top-panels .panel {
+  height: fit-content;
+}
+.panel details[open] {
+  z-index: 1;
 }
